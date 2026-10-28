@@ -7996,7 +7996,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.4.4/node_modules/magic-string/dist/index.mjs
+// node_modules/.aspect_rules_js/magic-string@1.4.5/node_modules/magic-string/dist/index.mjs
 import { encode, encodeRangeMappings } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
@@ -8007,6 +8007,17 @@ var BitSet = class BitSet2 {
   }
   has(n2) {
     return !!(this.bits[n2 >> 5] & 1 << (n2 & 31));
+  }
+  forEach(fn) {
+    const bits = this.bits;
+    for (let w = 0; w < bits.length; w++) {
+      let word = bits[w];
+      while (word) {
+        const lowest = word & -word;
+        fn((w << 5) + 31 - Math.clz32(lowest));
+        word ^= lowest;
+      }
+    }
   }
 };
 var Chunk = class Chunk2 {
@@ -8099,7 +8110,6 @@ var Chunk = class Chunk2 {
     if (this.edited) {
       newChunk.edit("", false, true);
       newChunk.replacedFrom = this.replacedFrom;
-      this.content = "";
     } else
       this.content = originalBefore;
     newChunk.next = this.next;
@@ -8369,8 +8379,8 @@ var Mappings = class {
     this.generatedCodeColumn = 0;
     this.raw = [];
     this.rawSegments = this.raw[this.generatedCodeLine] = [];
-    this.rawRangeMappings = [];
-    this.rawRangeMappingsIndices = this.rawRangeMappings[this.generatedCodeLine] = [];
+    this.rawRangeMappingsIndices = [];
+    this.rawRangeMappings = hires === "experimental-range" ? [this.rawRangeMappingsIndices] : void 0;
     this.encoder = encoder;
   }
   nextLine() {
@@ -8383,7 +8393,35 @@ var Mappings = class {
       this.generatedCodeLine += 1;
     }
     this.generatedCodeColumn = 0;
-    this.rawRangeMappings[this.generatedCodeLine] = this.rawRangeMappingsIndices = [];
+    if (this.rawRangeMappings)
+      this.rawRangeMappings[this.generatedCodeLine] = this.rawRangeMappingsIndices = [];
+  }
+  /**
+  * Emits the mappings for one MagicString: its intro, every chunk (with the
+  * chunk's own intro/outro) and its outro. `sourceIndex === -1` means the
+  * string has no source of its own, so its content only advances the
+  * generated position without mapping anything.
+  */
+  addMagicString(magicString, sourceIndex, nameIndex) {
+    const { original } = magicString;
+    const locate = getLocator(original);
+    if (magicString.intro)
+      this.advance(magicString.intro);
+    magicString.firstChunk.eachNext((chunk) => {
+      if (chunk.intro.length)
+        this.advance(chunk.intro);
+      if (sourceIndex === -1)
+        this.advance(chunk.content);
+      else if (chunk.edited) {
+        const name = chunk.storeName ? nameIndex.get(original.slice(chunk.start, chunk.replacesUntil)) : void 0;
+        this.addEdit(sourceIndex, chunk.content, locate(chunk.start), name ?? -1);
+      } else
+        this.addUneditedChunk(sourceIndex, chunk, original, locate(chunk.start), magicString.sourcemapLocations);
+      if (chunk.outro.length)
+        this.advance(chunk.outro);
+    });
+    if (magicString.outro)
+      this.advance(magicString.outro);
   }
   addEdit(sourceIndex, content, loc, nameIndex) {
     if (content.length) {
@@ -8597,6 +8635,9 @@ function expandReplacement(replacement, matched, position, str, captures, namedC
   return result;
 }
 var MagicString = class MagicString2 {
+  /**
+  * Wraps `string` for editing; every index passed to the editing methods refers to this original string.
+  */
   constructor(string, options = {}) {
     const chunk = new Chunk(0, string.length, string);
     Object.defineProperties(this, {
@@ -8646,7 +8687,7 @@ var MagicString = class MagicString2 {
       },
       storedNames: {
         writable: true,
-        value: {}
+        value: /* @__PURE__ */ new Set()
       },
       indentStr: {
         writable: true,
@@ -8687,7 +8728,9 @@ var MagicString = class MagicString2 {
   * See also `s.prependLeft(...)`.
   */
   appendLeft(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8704,7 +8747,9 @@ var MagicString = class MagicString2 {
   * See also `s.prependRight(...)`.
   */
   appendRight(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8716,7 +8761,10 @@ var MagicString = class MagicString2 {
     return this;
   }
   /**
-  * Does what you'd expect.
+  * Returns an independent copy: the chunk list, string-level intro/outro,
+  * sourcemap locations, stored names, indent exclusion ranges, `offset`,
+  * `filename` and `ignoreList` are all copied; later edits to either string
+  * do not affect the other.
   */
   clone() {
     const cloned = new MagicString2(this.original, {
@@ -8742,7 +8790,7 @@ var MagicString = class MagicString2 {
     if (this.indentExclusionRanges)
       cloned.indentExclusionRanges = this.indentExclusionRanges.slice();
     cloned.sourcemapLocations = new BitSet(this.sourcemapLocations);
-    cloned.storedNames = { ...this.storedNames };
+    cloned.storedNames = new Set(this.storedNames);
     cloned.intro = this.intro;
     cloned.outro = this.outro;
     cloned.hasMovedChunks = this.hasMovedChunks;
@@ -8778,24 +8826,8 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   _generateMappings(mappings) {
-    const sourceIndex = 0;
-    const names = Object.keys(this.storedNames);
-    const locate = getLocator(this.original);
-    if (this.intro)
-      mappings.advance(this.intro);
-    this.firstChunk.eachNext((chunk) => {
-      const loc = locate(chunk.start);
-      if (chunk.intro.length)
-        mappings.advance(chunk.intro);
-      if (chunk.edited)
-        mappings.addEdit(sourceIndex, chunk.content, loc, chunk.storeName ? names.indexOf(chunk.original) : -1);
-      else
-        mappings.addUneditedChunk(sourceIndex, chunk, this.original, loc, this.sourcemapLocations);
-      if (chunk.outro.length)
-        mappings.advance(chunk.outro);
-    });
-    if (this.outro)
-      mappings.advance(this.outro);
+    const names = [...this.storedNames];
+    mappings.addMagicString(this, 0, new Map(names.map((name, i) => [name, i])));
     return names;
   }
   /** @internal */
@@ -8818,9 +8850,13 @@ var MagicString = class MagicString2 {
     this._ensureindentStr();
     return this.indentStr;
   }
+  /**
+  * Returns the indentation string guessed from the original content, falling back to a single tab character.
+  * This is the value `s.indent()` uses when no prefix is supplied.
+  */
   getIndentString() {
     this._ensureindentStr();
-    return this.indentStr === null ? "	" : this.indentStr;
+    return this.indentStr ?? "	";
   }
   indent(indentStr, options) {
     const pattern = /^[^\r\n]/gm;
@@ -8836,11 +8872,11 @@ var MagicString = class MagicString2 {
       return this;
     const resolvedIndentStr = indentStr;
     options = options || {};
-    const isExcluded = {};
+    const isExcluded = new BitSet();
     if (options.exclude)
       (typeof options.exclude[0] === "number" ? [options.exclude] : options.exclude).forEach((exclusion) => {
         for (let i = exclusion[0]; i < exclusion[1]; i += 1)
-          isExcluded[i] = true;
+          isExcluded.add(i);
       });
     let shouldIndentNextCharacter = options.indentStart !== false;
     const indentPiece = (str) => {
@@ -8865,15 +8901,17 @@ var MagicString = class MagicString2 {
     };
     while (chunk) {
       const end = chunk.end;
-      if (!isExcluded[chunk.start])
+      if (!isExcluded.has(chunk.start))
         chunk.intro = indentPiece(chunk.intro);
       if (chunk.edited) {
-        if (!isExcluded[charIndex])
+        if (!isExcluded.has(chunk.start))
           chunk.content = indentPiece(chunk.content);
+        else if (chunk.content)
+          shouldIndentNextCharacter = chunk.content[chunk.content.length - 1] === "\n";
       } else if (options.exclude) {
         charIndex = chunk.start;
         while (charIndex < end) {
-          if (!isExcluded[charIndex]) {
+          if (!isExcluded.has(charIndex)) {
             const char = this.original.charCodeAt(charIndex);
             if (char === NEWLINE_CHAR)
               shouldIndentNextCharacter = true;
@@ -8902,7 +8940,7 @@ var MagicString = class MagicString2 {
           charIndex += 1;
         }
       }
-      if (!isExcluded[chunk.end - 1])
+      if (!isExcluded.has(chunk.end - 1))
         chunk.outro = indentPiece(chunk.outro);
       charIndex = chunk.end;
       chunk = chunk.next;
@@ -8940,11 +8978,15 @@ var MagicString = class MagicString2 {
   * mirroring the `appendLeft`/`appendRight` distinction.
   */
   move(start, end, index, affinity = "right") {
-    start = start + this.offset;
-    end = end + this.offset;
-    index = index + this.offset;
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
+    index = this._resolveIndex(index);
     if (start === end)
       return this;
+    if (start < 0 || end > this.original.length || index < 0 || index > this.original.length)
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
+    if (start > end)
+      throw new MagicStringError(`end must be greater than start (start: ${start}, end: ${end})`);
     if (index >= start && index <= end)
       throw new MagicStringError("cannot move a selection inside itself");
     this._split(start);
@@ -8952,6 +8994,8 @@ var MagicString = class MagicString2 {
     this._split(index);
     const first = this.byStart.get(start);
     const last = this.byEnd.get(end);
+    if (!first || !last)
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
     if (this.hasMovedChunks) {
       let cursor = first;
       while (cursor !== last) {
@@ -8995,10 +9039,10 @@ var MagicString = class MagicString2 {
       newLeft.next = first;
     if (newRight)
       newRight.previous = last;
-    if (!first.previous)
-      this.firstChunk = last.next;
-    if (!last.next) {
-      this.lastChunk = first.previous;
+    if (!oldLeft)
+      this.firstChunk = oldRight;
+    if (!oldRight) {
+      this.lastChunk = oldLeft;
       this.lastChunk.next = null;
     }
     first.previous = newLeft;
@@ -9021,6 +9065,16 @@ var MagicString = class MagicString2 {
   * It may be preferred to use `s.update(...)` instead if you wish to avoid overwriting the appended/prepended content.
   */
   overwrite(start, end, content, options) {
+    if (options === true) {
+      if (!warned.storeName) {
+        console.warn("The final argument to magicString.overwrite(...) should be an options object. See https://github.com/rich-harris/magic-string");
+        warned.storeName = true;
+      }
+      return this.update(start, end, content, {
+        storeName: true,
+        overwrite: true
+      });
+    }
     const optionObject = typeof options === "object" && options ? options : {};
     return this.update(start, end, content, {
       ...optionObject,
@@ -9035,16 +9089,10 @@ var MagicString = class MagicString2 {
   * the content is overwritten, or anything that was appended/prepended to the range as well.
   */
   update(start, end, content, options) {
-    start = start + this.offset;
-    end = end + this.offset;
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
     if (start < 0)
       throw new MagicStringError(`start ${start} is out of bounds`);
     if (end > this.original.length)
@@ -9065,38 +9113,23 @@ var MagicString = class MagicString2 {
     const optionObject = typeof options === "object" && options ? options : {};
     const storeName = optionObject.storeName || false;
     const overwrite = optionObject.overwrite || false;
-    if (storeName) {
-      const original = this.original.slice(start, end);
-      Object.defineProperty(this.storedNames, original, {
-        writable: true,
-        value: true,
-        enumerable: true
-      });
-    }
+    if (storeName)
+      this.storedNames.add(this.original.slice(start, end));
     const first = this.byStart.get(start);
-    const last = this.byEnd.get(end);
-    if (first) {
-      let chunk = first;
-      while (chunk !== last) {
-        if (chunk.next !== this.byStart.get(chunk.end))
-          throw new MagicStringError("cannot overwrite across a split point");
-        chunk = chunk.next;
-      }
-      chunk = first;
-      while (chunk !== last) {
-        chunk = chunk.next;
-        chunk.edit("", false, !overwrite);
-        chunk.replacesUntil = -1;
-        chunk.replacedFrom = start;
-      }
-      first.edit(content, storeName, !overwrite);
-      first.replacesUntil = end;
-      first.replacedFrom = -1;
-    } else {
-      const newChunk = new Chunk(start, end, "").edit(content, storeName);
-      last.next = newChunk;
-      newChunk.previous = last;
+    for (let chunk = first; chunk.end < end; ) {
+      const next = chunk.next;
+      if (next === null || next !== this.byStart.get(chunk.end))
+        throw new MagicStringError("cannot overwrite across a split point");
+      chunk = next;
     }
+    for (let chunk = first.next; chunk !== null && chunk.start < end; chunk = chunk.next) {
+      chunk.edit("", false, !overwrite);
+      chunk.replacesUntil = -1;
+      chunk.replacedFrom = start;
+    }
+    first.edit(content, storeName, !overwrite);
+    first.replacesUntil = end;
+    first.replacedFrom = -1;
     return this;
   }
   /**
@@ -9112,7 +9145,9 @@ var MagicString = class MagicString2 {
   * Same as `s.appendLeft(...)`, except that the inserted content will go *before* any previous appends or prepends at index
   */
   prependLeft(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -9127,7 +9162,9 @@ var MagicString = class MagicString2 {
   * Same as `s.appendRight(...)`, except that the inserted content will go *before* any previous appends or prepends at `index`
   */
   prependRight(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -9146,14 +9183,8 @@ var MagicString = class MagicString2 {
   * Repeated removals and removals with partially overlapping ranges are allowed.
   */
   remove(start, end) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -9171,7 +9202,7 @@ var MagicString = class MagicString2 {
       chunk.edit("", false, true);
       chunk.replacesUntil = -1;
       chunk.replacedFrom = -1;
-      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : void 0;
     }
     return this;
   }
@@ -9179,14 +9210,8 @@ var MagicString = class MagicString2 {
   * Reset the modified characters from `start` to `end` (of the original string, **not** the generated string).
   */
   reset(start, end) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -9198,10 +9223,13 @@ var MagicString = class MagicString2 {
     let chunk = this.byStart.get(start);
     while (chunk) {
       chunk.reset();
-      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : void 0;
     }
     return this;
   }
+  /**
+  * Returns the last character of the generated string, or `''` if it is empty.
+  */
   lastChar() {
     if (this.outro.length)
       return this.outro[this.outro.length - 1];
@@ -9219,57 +9247,64 @@ var MagicString = class MagicString2 {
       return this.intro[this.intro.length - 1];
     return "";
   }
+  /**
+  * Returns everything after the last newline in the generated string, or the whole string if there is no newline.
+  */
   lastLine() {
     let lineIndex = this.outro.lastIndexOf(n);
     if (lineIndex !== -1)
-      return this.outro.substr(lineIndex + 1);
+      return this.outro.slice(lineIndex + 1);
     let lineStr = this.outro;
     let chunk = this.lastChunk;
     while (chunk) {
       if (chunk.outro.length > 0) {
         lineIndex = chunk.outro.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.outro.substr(lineIndex + 1) + lineStr;
+          return chunk.outro.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.outro + lineStr;
       }
       if (chunk.content.length > 0) {
         lineIndex = chunk.content.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.content.substr(lineIndex + 1) + lineStr;
+          return chunk.content.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.content + lineStr;
       }
       if (chunk.intro.length > 0) {
         lineIndex = chunk.intro.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.intro.substr(lineIndex + 1) + lineStr;
+          return chunk.intro.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.intro + lineStr;
       }
       chunk = chunk.previous;
     }
     lineIndex = this.intro.lastIndexOf(n);
     if (lineIndex !== -1)
-      return this.intro.substr(lineIndex + 1) + lineStr;
+      return this.intro.slice(lineIndex + 1) + lineStr;
     return this.intro + lineStr;
   }
   /**
-  * Returns the content of the generated string that corresponds to the slice between `start` and `end` of the original string.
-  * Throws error if the indices are for characters that were already removed.
+  * Returns the content of the generated string that corresponds to the slice
+  * between `start` and `end` of the original string, walking the generated
+  * string from the chunk holding `start` to the chunk holding `end`. Throws
+  * if either index falls inside replaced content. After `move()`, a range
+  * whose end now comes before its start in the output yields `''`.
   */
   slice(start = 0, end = this.original.length - this.offset) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     let result = "";
-    let chunk = this.firstChunk;
-    while (chunk && (chunk.start > start || chunk.end <= start)) {
-      if (chunk.start < end && chunk.end >= end || end === 0 && chunk.start === 0)
+    let chunk;
+    if (this.hasMovedChunks) {
+      chunk = this.firstChunk;
+      while (chunk && (chunk.start > start || chunk.end <= start)) {
+        if (chunk.start < end && chunk.end >= end || end === 0 && chunk.start === 0)
+          return result;
+        chunk = chunk.next;
+      }
+    } else {
+      if (start >= end)
         return result;
-      chunk = chunk.next;
+      chunk = this._chunkAt(start);
     }
     if (chunk && chunk.edited && chunk.start !== start)
       throw new MagicStringError(`cannot use edited character ${start} as slice start anchor`);
@@ -9301,6 +9336,40 @@ var MagicString = class MagicString2 {
     clone.remove(-clone.offset, start);
     clone.remove(end, clone.original.length - clone.offset);
     return clone;
+  }
+  /**
+  * Applies `offset`, resolves a negative index from the end of `original` as
+  * `update`/`remove` always have, and rejects anything that is not an integer.
+  * Bounds are checked by the caller, because the methods report them differently.
+  *
+  * @internal
+  */
+  _resolveIndex(index) {
+    const resolved = index + this.offset;
+    if (!Number.isInteger(resolved))
+      throw new MagicStringError(`index must be an integer, got ${index}`);
+    if (resolved < 0 && this.original.length !== 0)
+      return Math.max(0, resolved + this.original.length);
+    return resolved;
+  }
+  /**
+  * The chunk whose original range holds `index` (`chunk.start <= index < chunk.end`),
+  * or `undefined` when `index` is at or past the end. Searches from the last
+  * visited chunk so that scans over nearby indices stay cheap.
+  *
+  * @internal
+  */
+  _chunkAt(index) {
+    let chunk = this.byStart.get(index);
+    if (chunk)
+      return chunk;
+    chunk = this.lastSearchedChunk;
+    const searchForward = index >= chunk.end;
+    while (chunk && !chunk.contains(index))
+      chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
+    if (chunk)
+      this.lastSearchedChunk = chunk;
+    return chunk;
   }
   /** @internal */
   _split(index) {
@@ -9361,6 +9430,11 @@ var MagicString = class MagicString2 {
       return false;
     return true;
   }
+  /**
+  * Returns the length of the generated string, counting only content attached to the original characters.
+  * Content outside the string body (`s.prepend()`/`s.append()`, and inserts before the first or after the last
+  * character) is not counted, so this can differ from `s.toString().length`.
+  */
   length() {
     let chunk = this.firstChunk;
     let length = 0;
@@ -9393,11 +9467,12 @@ var MagicString = class MagicString2 {
       const end = chunk.end;
       const aborted = chunk.trimEnd(rx);
       if (chunk.end !== end) {
+        const next = chunk.next;
         if (this.lastChunk === chunk)
-          this.lastChunk = chunk.next;
+          this.lastChunk = next;
         this.byEnd.set(chunk.end, chunk);
-        this.byStart.set(chunk.next.start, chunk.next);
-        this.byEnd.set(chunk.next.end, chunk.next);
+        this.byStart.set(next.start, next);
+        this.byEnd.set(next.end, next);
       }
       if (aborted)
         return true;
@@ -9424,11 +9499,12 @@ var MagicString = class MagicString2 {
       const end = chunk.end;
       const aborted = chunk.trimStart(rx);
       if (chunk.end !== end) {
+        const next = chunk.next;
         if (chunk === this.lastChunk)
-          this.lastChunk = chunk.next;
+          this.lastChunk = next;
         this.byEnd.set(chunk.end, chunk);
-        this.byStart.set(chunk.next.start, chunk.next);
-        this.byEnd.set(chunk.next.end, chunk.next);
+        this.byStart.set(next.start, next);
+        this.byEnd.set(next.end, next);
       }
       if (aborted)
         return true;
@@ -9475,19 +9551,12 @@ var MagicString = class MagicString2 {
   * @internal
   */
   _hasRemovedContent(start, end) {
-    let chunk = this.byStart.get(start);
-    if (chunk && start === end) {
+    const atBoundary = this.byStart.get(start);
+    if (atBoundary && start === end) {
       const previous = this.byEnd.get(start);
-      return !!previous && previous.content === "" && chunk.content === "";
+      return !!previous && previous.content === "" && atBoundary.content === "";
     }
-    if (!chunk) {
-      chunk = this.lastSearchedChunk;
-      const searchForward = start >= chunk.end;
-      while (chunk && !chunk.contains(start))
-        chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
-      if (chunk)
-        this.lastSearchedChunk = chunk;
-    }
+    let chunk = this._chunkAt(start);
     while (chunk && chunk.start < end) {
       if (chunk.content === "" && (chunk.replacedFrom < start || this.byStart.get(chunk.replacedFrom).replacesUntil < chunk.end))
         return true;
@@ -9497,18 +9566,18 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   _replaceRegexp(searchValue, replacement) {
-    function getReplacement(match, str) {
+    function getReplacement(match, index, str) {
       if (typeof replacement === "string")
-        return expandReplacement(replacement, match[0], match.index, str, match.slice(1), match.groups);
+        return expandReplacement(replacement, match[0], index, str, match.slice(1), match.groups);
       else
-        return match.groups === void 0 ? replacement(match[0], ...match.slice(1), match.index, str) : replacement(match[0], ...match.slice(1), match.index, str, match.groups);
+        return match.groups === void 0 ? replacement(match[0], ...match.slice(1), index, str) : replacement(match[0], ...match.slice(1), index, str, match.groups);
     }
     const replaceMatch = (match) => {
       if (match.index == null)
         return false;
       if (this._hasRemovedContent(match.index, match.index + match[0].length))
         return false;
-      const replacement2 = getReplacement(match, this.original);
+      const replacement2 = getReplacement(match, match.index, this.original);
       if (replacement2 === match[0])
         return true;
       if (match[0].length === 0)
@@ -10590,7 +10659,7 @@ var InlineTcbOp = class {
    * Type check blocks are inserted immediately after the end of the directive class.
    */
   get splitPoint() {
-    return this.ref.node.end + 1;
+    return this.ref.node.end;
   }
   execute(im, tcbSf, refEmitter) {
     const env = new Environment(this.config, im, refEmitter, tcbSf);
@@ -15027,4 +15096,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CDKXDQYT.js.map
+//# sourceMappingURL=chunk-57C3EP7T.js.map
