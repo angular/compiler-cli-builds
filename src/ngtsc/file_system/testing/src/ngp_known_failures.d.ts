@@ -26,4 +26,3 @@
  */
 export declare function isNgpSkipEnabled(): boolean;
 export declare function shouldSkipInNgp(fullSpecName: string): boolean;
-export declare function shouldSkipComplianceInNgp(mode: string, relativePath: string, description: string): boolean;

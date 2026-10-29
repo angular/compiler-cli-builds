@@ -9988,6 +9988,14 @@ var TypeCheckFile = class extends Environment {
   get hasCopiedSource() {
     return this.copiedSourceOriginPath !== void 0;
   }
+  setCopiedSourceOrigin(sourceFile) {
+    const originPath = absoluteFromSourceFile(sourceFile);
+    if (this.copiedSourceOriginPath === originPath) {
+      return;
+    }
+    this.copiedSourceOriginPath = originPath;
+    this.contextFile = ts31.createSourceFile(this.contextFile.fileName, sourceFile.text, ts31.ScriptTarget.Latest, true);
+  }
   setSourceContent(text) {
     this.sourceContent = text;
   }
@@ -10008,19 +10016,18 @@ var TypeCheckFile = class extends Environment {
     this.tcbStatements.push(fn);
   }
   render() {
-    ensureTypeCheckFilePreparationImports(this);
-    const importChanges = this.importManager.finalize();
-    if (importChanges.updatedImports.size > 0) {
-      throw new Error("AssertionError: Expected no imports to be updated for a new type check file.");
-    }
-    const printer = ts31.createPrinter();
     let source = this.sourceContent;
-    const newImports = importChanges.newImports.get(this.contextFile.fileName);
-    if (newImports !== void 0) {
-      if (source.length > 0 && !source.endsWith("\n")) {
-        source += "\n";
+    if (!this.hasCopiedSource) {
+      ensureTypeCheckFilePreparationImports(this);
+      const importChanges = this.importManager.finalize();
+      if (importChanges.updatedImports.size > 0) {
+        throw new Error("AssertionError: Expected no imports to be updated for a new type check file.");
       }
-      source += newImports.map((i) => printer.printNode(ts31.EmitHint.Unspecified, i, this.contextFile)).join("\n");
+      const printer = ts31.createPrinter();
+      const newImports = importChanges.newImports.get(this.contextFile.fileName);
+      if (newImports !== void 0) {
+        source += newImports.map((i) => printer.printNode(ts31.EmitHint.Unspecified, i, this.contextFile)).join("\n");
+      }
     }
     source += "\n";
     for (const expr of this.pipeInstStatements) {
@@ -10172,7 +10179,7 @@ var TypeCheckContextImpl = class {
     if (inliningRequirement !== TcbInliningRequirement.None && (this.inlining === InliningMode.InlineOps || this.inlining === InliningMode.CopySourceToTcb)) {
       this.addInlineTypeCheckBlock(fileData, shimData, ref, meta);
       if (this.inlining === InliningMode.CopySourceToTcb) {
-        shimData.file.copiedSourceOriginPath = absoluteFromSourceFile(sourceFile);
+        shimData.file.setCopiedSourceOrigin(sourceFile);
       }
     } else if (inliningRequirement === TcbInliningRequirement.ShouldInlineForGenericBounds && this.inlining === InliningMode.Error) {
       shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.FallbackToAny, this.reflector);
@@ -10198,27 +10205,23 @@ var TypeCheckContextImpl = class {
   /**
    * Applies operations to a file.
    */
-  executeOperations(targetSf, opsSourceSf) {
+  executeOperations(targetSf, opsSourceSf, importManager) {
     const printer = ts32.createPrinter({ omitTrailingSemicolon: true });
-    const importManager = new ImportManager({
-      // This minimizes noticeable changes with older versions of `ImportManager`.
-      forceGenerateNamespacesForNewImports: true,
-      // Type check block code affects code completion and fix suggestions.
-      // We want to encourage single quotes for now, like we always did.
-      shouldUseSingleQuotes: () => true
-    });
     const updates = this.opMap.get(opsSourceSf).map((op) => {
       return {
         pos: op.splitPoint,
         text: op.execute(importManager, targetSf, this.refEmitter)
       };
     });
+    if (targetSf !== opsSourceSf) {
+      ensureTypeCheckFilePreparationImports(new ReferenceEmitEnvironment(importManager, this.refEmitter, targetSf));
+    }
     const { newImports, updatedImports } = importManager.finalize();
     if (newImports.has(targetSf.fileName)) {
       newImports.get(targetSf.fileName).forEach((newImport) => {
         updates.push({
           pos: 0,
-          text: printer.printNode(ts32.EmitHint.Unspecified, newImport, targetSf)
+          text: printer.printNode(ts32.EmitHint.Unspecified, newImport, targetSf) + "\n"
         });
       });
     }
@@ -10248,17 +10251,23 @@ var TypeCheckContextImpl = class {
     if (this.inlining !== InliningMode.InlineOps || !this.opMap.has(sf)) {
       return null;
     }
-    return this.executeOperations(sf, sf);
+    const importManager = new ImportManager({
+      // This minimizes noticeable changes with older versions of `ImportManager`.
+      forceGenerateNamespacesForNewImports: true,
+      // Type check block code affects code completion and fix suggestions.
+      // We want to encourage single quotes for now, like we always did.
+      shouldUseSingleQuotes: () => true
+    });
+    return this.executeOperations(sf, sf, importManager);
   }
   /**
    * Generates the content for a shim file that copies the source of the original file.
    */
-  generateCopiedShimContent(originalSf, shimFileName) {
+  generateCopiedShimContent(originalSf, shimFile) {
     if (this.inlining !== InliningMode.CopySourceToTcb || !this.opMap.has(originalSf)) {
       return null;
     }
-    const fakeSf = ts32.createSourceFile(shimFileName, originalSf.text, ts32.ScriptTarget.Latest, true);
-    return this.executeOperations(fakeSf, originalSf);
+    return this.executeOperations(shimFile.contextFile, originalSf, shimFile.importManager);
   }
   finalize() {
     const updates = /* @__PURE__ */ new Map();
@@ -10273,6 +10282,13 @@ var TypeCheckContextImpl = class {
     }
     for (const [sfPath, pendingFileData] of this.fileMap) {
       for (const pendingShimData of pendingFileData.shimData.values()) {
+        const originalSf = pendingFileData.sourceFile;
+        if (originalSf !== void 0) {
+          const transformedText = this.generateCopiedShimContent(originalSf, pendingShimData.file);
+          if (transformedText !== null) {
+            pendingShimData.file.setSourceContent(transformedText);
+          }
+        }
         const genesisDiagnostics = [
           ...pendingShimData.domSchemaChecker.diagnostics,
           ...pendingShimData.oobRecorder.diagnostics
@@ -10286,13 +10302,6 @@ var TypeCheckContextImpl = class {
           path: pendingShimData.file.fileName,
           data: pendingShimData.data
         });
-        const originalSf = pendingFileData.sourceFile;
-        if (originalSf !== void 0) {
-          const transformedText = this.generateCopiedShimContent(originalSf, pendingShimData.file.fileName);
-          if (transformedText !== null) {
-            pendingShimData.file.setSourceContent(transformedText);
-          }
-        }
         const sfText = pendingShimData.file.render();
         updates.set(pendingShimData.file.fileName, {
           newText: sfText,
@@ -14800,4 +14809,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-X3CYTFD2.js.map
+//# sourceMappingURL=chunk-UGKSO7XM.js.map
