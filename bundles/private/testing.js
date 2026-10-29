@@ -442,18 +442,6 @@ function shouldSkipInNgp(fullSpecName) {
   return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_REQUIRES_TYPE_CHECKER.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
 }
 var NGP_KNOWN_TYPECHECK_FAILURES = /* @__PURE__ */ new Set([
-  "host directives should produce a diagnostic for host directive inputs and outputs that have not been exposed",
-  "input signal type-check diagnostics inline constructor generic inference",
-  "input signal type-check diagnostics with `--strict` inline constructor generic inference",
-  "model inputs type-check diagnostics inline constructor generic inference, one-way binding",
-  "model inputs type-check diagnostics inline constructor generic inference, two-way binding",
-  "model inputs type-check diagnostics with `--strict` inline constructor generic inference, one-way binding",
-  "model inputs type-check diagnostics with `--strict` inline constructor generic inference, two-way binding",
-  "template diagnostics checks bindings to regular element",
-  "template diagnostics does not repeat diagnostics for missing pipes in directive inputs",
-  "template diagnostics infers generic pipe return types correctly and avoids expanding to strict undefined errors",
-  "template diagnostics should disallow binding to event properties starting with on",
-  "template diagnostics should support type-narrowing for methods with type guards",
   "template parse failures should handle TypeScript parse failures gracefully",
   "template parse failures should handle non-Error failures gracefully",
   // The tests below check a pattern that is not allowed (private inputs/outputs). The reason they
