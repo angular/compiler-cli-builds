@@ -691,15 +691,7 @@ var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "ngtsc @defer block block-specific deferredImports type checking should report an error when a pipe declared in a keyed block is used in an unnamed defer block",
   "ngtsc behavioral tests cycle detection should detect a simple cycle and fatally error if doing partial-compilation",
   "ngtsc compilation of standalone types component-side should compile a standalone component in a cycle with its module",
-  "ngtsc incremental compilation template type-checking should retain default imports that have been converted into a value expression",
-  "ngtsc type checking @let declarations should produce a single diagnostic if a @let declaration invokes itself",
-  "ngtsc type checking @let declarations should produce a single diagnostic if a @let declaration refers to properties on itself",
-  "ngtsc type checking @let declarations should report @let declaration used in the expression of a @if block before it is defined",
-  "ngtsc type checking for loop blocks should not allow usages of aliased `if` block variables inside the tracking expression",
-  "ngtsc type checking for loop blocks should not allow usages of local references outside of the template in the tracking expression",
-  "ngtsc type checking for loop blocks should not allow usages of local references within the same template inside the tracking expression",
-  "ngtsc type checking for loop blocks should not allow usages of parent loop variables inside the tracking expression",
-  "ngtsc type checking for loop blocks should not allow usages of parent template variables inside the tracking expression"
+  "ngtsc incremental compilation template type-checking should retain default imports that have been converted into a value expression"
 ]);
 
 // packages/compiler-cli/src/ngtsc/file_system/testing/src/test_helper.js
