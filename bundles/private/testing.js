@@ -439,31 +439,8 @@ function shouldSkipInNgp(fullSpecName) {
     return false;
   }
   const normalized = fullSpecName.replace(/\s+/g, " ").trim();
-  return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_REQUIRES_TYPE_CHECKER.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
+  return NGP_REQUIRES_TYPE_CHECKER.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
 }
-var NGP_KNOWN_TYPECHECK_FAILURES = /* @__PURE__ */ new Set([
-  "template parse failures should handle TypeScript parse failures gracefully",
-  "template parse failures should handle non-Error failures gracefully",
-  // The tests below check a pattern that is not allowed (private inputs/outputs). The reason they
-  // pass with ngtsc is that the tests are set up in a way that bypasses some validations.
-  // TODO(crisbeto): clean up these tests since they aren't testing a valid pattern.
-  "input signal type-check diagnostics allow access to private input if modifiers are explicitly ignored",
-  "input signal type-check diagnostics allow access to private input if modifiers are explicitly ignored, but error if not assignable",
-  "input signal type-check diagnostics disallows access to private input",
-  "input signal type-check diagnostics with `--strict` allow access to private input if modifiers are explicitly ignored",
-  "input signal type-check diagnostics with `--strict` allow access to private input if modifiers are explicitly ignored, but error if not assignable",
-  "input signal type-check diagnostics with `--strict` disallows access to private input",
-  "model inputs type-check diagnostics allow access to private input if modifiers are explicitly ignored",
-  "model inputs type-check diagnostics allow access to private model if modifiers are explicitly ignored, but error if not assignable",
-  "model inputs type-check diagnostics allows access to private output",
-  "model inputs type-check diagnostics allows access to protected output",
-  "model inputs type-check diagnostics disallows access to private model",
-  "model inputs type-check diagnostics with `--strict` allow access to private input if modifiers are explicitly ignored",
-  "model inputs type-check diagnostics with `--strict` allow access to private model if modifiers are explicitly ignored, but error if not assignable",
-  "model inputs type-check diagnostics with `--strict` allows access to private output",
-  "model inputs type-check diagnostics with `--strict` allows access to protected output",
-  "model inputs type-check diagnostics with `--strict` disallows access to private model"
-]);
 var NGP_REQUIRES_TYPE_CHECKER = /* @__PURE__ */ new Set([
   // Detecting writes to read-only `@let` or `@for` variables in two-way bindings (NG8005)
   // requires a TypeChecker (`isSignalReference`) to distinguish non-signal variables from
@@ -683,9 +660,17 @@ var NGP_POTENTIAL_BREAKING_CHANGES = /* @__PURE__ */ new Set([
   "selectorless should resolve local reference to selectorless component",
   "selectorless should resolve local reference to selectorless directive",
   "selectorless should treat unclaimed inputs as DOM property bindings on component nodes",
-  "selectorless should treat unclaimed outputs as DOM events on component nodes"
+  "selectorless should treat unclaimed outputs as DOM events on component nodes",
+  // The two tests check behavior specific to the TS6 source
+  // file construction so we don't need to support them.
+  "template parse failures should handle TypeScript parse failures gracefully",
+  "template parse failures should handle non-Error failures gracefully",
+  // Tests TypeScript `structureIsReused` across in-memory ngtsc incremental compilations.
+  "ngtsc type checking stability should allow for complete program reuse during incremental compilations"
 ]);
 var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
+  "model inputs type-check diagnostics allows access to protected output",
+  "model inputs type-check diagnostics with `--strict` allows access to protected output",
   "import generation should report an error when a library entry-point does not export the symbol",
   "import generation should report an error when using a directive outside of rootDirs",
   // API documentation extraction (`getApiDocumentation`) is not implemented in NGP.
