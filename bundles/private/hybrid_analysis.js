@@ -8,20 +8,22 @@ import {
   IndexingContext,
   generateIndexerAnalysis,
   getIndexerTemplateIdentifiers
-} from "../chunk-ZJBQUE3A.js";
+} from "../chunk-PJDDMTBK.js";
 import {
   Environment,
   ExpressionIdentifier,
   ImportManager,
-  PotentialTopLevelReadsVisitor,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
-  extractHmrDependenciesFromOutput,
   findFirstMatchingNode,
-  hasExpressionIdentifier,
+  hasExpressionIdentifier
+} from "../chunk-VPXF3SPH.js";
+import {
+  PotentialTopLevelReadsVisitor,
+  extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-6JVXY2BY.js";
+} from "../chunk-75X7ZOFT.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";

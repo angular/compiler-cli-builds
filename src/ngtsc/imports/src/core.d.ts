@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { validateAndRewriteCoreSymbol } from './core_symbols';
+export { validateAndRewriteCoreSymbol };
 /**
  * Rewrites imports of symbols being written into generated code.
  */
@@ -42,4 +44,3 @@ export declare class R3SymbolsImportRewriter implements ImportRewriter {
     rewriteSpecifier(specifier: string, inContextOfFile: string): string;
     rewriteNamespaceImportIdentifier(specifier: string): string;
 }
-export declare function validateAndRewriteCoreSymbol(name: string): string;
