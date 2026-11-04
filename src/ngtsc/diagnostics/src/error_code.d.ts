@@ -56,7 +56,9 @@ export declare enum ErrorCode {
     PIPE_MISSING_NAME = 2002,
     PARAM_MISSING_TOKEN = -2003,
     DIRECTIVE_MISSING_SELECTOR = 2004,
-    /** Raised when an undecorated class is passed in as a provider to a module or a directive. */
+    /**
+     * Raised when an undecorated class is passed in as a provider to a module or a directive.
+     */
     UNDECORATED_PROVIDER = 2005,
     /**
      * Raised when a Directive inherits its constructor from a base class without an Angular
@@ -108,7 +110,9 @@ export declare enum ErrorCode {
      * which has a constructor that is incompatible with Angular DI.
      */
     INJECTABLE_INHERITS_INVALID_CONSTRUCTOR = 2016,
-    /** Raised when a host tries to alias a host directive binding that does not exist. */
+    /**
+     * Raised when a host tries to alias a host directive binding that does not exist.
+     */
     HOST_DIRECTIVE_UNDEFINED_BINDING = 2017,
     /**
      * Raised when a host tries to alias a host directive
@@ -125,7 +129,9 @@ export declare enum ErrorCode {
      * and has a corresponding `ngAcceptInputType_` member for the same input.
      */
     CONFLICTING_INPUT_TRANSFORM = 2020,
-    /** Raised when a component has both `styleUrls` and `styleUrl`. */
+    /**
+     * Raised when a component has both `styleUrls` and `styleUrl`.
+     */
     COMPONENT_INVALID_STYLE_URLS = 2021,
     /**
      * Raised when a type in the `deferredImports` of a component is not a component, directive or
@@ -229,10 +235,6 @@ export declare enum ErrorCode {
      */
     WARN_NGMODULE_ID_UNNECESSARY = -6100,
     /**
-     * 6999 was previously assigned to NGMODULE_VE_DEPENDENCY_ON_IVY_LIB
-     * To prevent any confusion, let's not reassign it.
-     */
-    /**
      * An element name failed validation against the DOM schema.
      */
     SCHEMA_INVALID_ELEMENT = -8001,
@@ -332,11 +334,17 @@ export declare enum ErrorCode {
      * also included into the `@Component.imports` list.
      */
     DEFERRED_DEPENDENCY_IMPORTED_EAGERLY = 8014,
-    /** An expression is trying to write to an `@let` declaration. */
+    /**
+     * An expression is trying to write to an `@let` declaration.
+     */
     ILLEGAL_LET_WRITE = 8015,
-    /** An expression is trying to read an `@let` before it has been defined. */
+    /**
+     * An expression is trying to read an `@let` before it has been defined.
+     */
     LET_USED_BEFORE_DEFINITION = 8016,
-    /** A `@let` declaration conflicts with another symbol in the same scope. */
+    /**
+     * A `@let` declaration conflicts with another symbol in the same scope.
+     */
     CONFLICTING_LET_DECLARATION = 8017,
     /**
      * A binding inside selectorless directive syntax did
@@ -346,7 +354,7 @@ export declare enum ErrorCode {
     /**
      * An `@defer` block with an implicit trigger does not have a placeholder, for example:
      *
-     * ```
+     * ```angular-html
      * @defer(on viewport) {
      *   Hello
      * }
@@ -356,7 +364,7 @@ export declare enum ErrorCode {
     /**
      * The `@placeholder` for an implicit `@defer` trigger is not set up correctly, for example:
      *
-     * ```
+     * ```angular-html
      * @defer(on viewport) {
      *   Hello
      * } @placeholder {
@@ -373,7 +381,9 @@ export declare enum ErrorCode {
      * prefetch timer delay that is not earlier than the main timer, or an identical prefetch
      */
     DEFER_TRIGGER_MISCONFIGURATION = 8021,
-    /** Raised when the user has an unsupported binding on a `FormField` directive. */
+    /**
+     * Raised when the user has an unsupported binding on a `FormField` directive.
+     */
     FORM_FIELD_UNSUPPORTED_BINDING = 8022,
     /**
      * Raised when multiple components in the compilation scope match a given element in a template.
@@ -600,6 +610,8 @@ export declare enum ErrorCode {
      *  constructor() {
      *    this.myInput(); // Error
      *  }
+     * }
+     * ```
      */
     FORBIDDEN_REQUIRED_INITIALIZER_INVOCATION = 8118,
     /**

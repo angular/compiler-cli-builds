@@ -1,0 +1,237 @@
+
+      import {createRequire as __cjsCompatRequire} from 'module';
+      const require = __cjsCompatRequire(import.meta.url);
+    
+
+// packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
+var ErrorCode;
+(function(ErrorCode2) {
+  ErrorCode2[ErrorCode2["DECORATOR_ARG_NOT_LITERAL"] = -1001] = "DECORATOR_ARG_NOT_LITERAL";
+  ErrorCode2[ErrorCode2["DECORATOR_ARITY_WRONG"] = 1002] = "DECORATOR_ARITY_WRONG";
+  ErrorCode2[ErrorCode2["DECORATOR_NOT_CALLED"] = 1003] = "DECORATOR_NOT_CALLED";
+  ErrorCode2[ErrorCode2["DECORATOR_UNEXPECTED"] = 1005] = "DECORATOR_UNEXPECTED";
+  ErrorCode2[ErrorCode2["DECORATOR_COLLISION"] = 1006] = "DECORATOR_COLLISION";
+  ErrorCode2[ErrorCode2["VALUE_HAS_WRONG_TYPE"] = 1010] = "VALUE_HAS_WRONG_TYPE";
+  ErrorCode2[ErrorCode2["VALUE_NOT_LITERAL"] = 1011] = "VALUE_NOT_LITERAL";
+  ErrorCode2[ErrorCode2["DUPLICATE_DECORATED_PROPERTIES"] = 1012] = "DUPLICATE_DECORATED_PROPERTIES";
+  ErrorCode2[ErrorCode2["INITIALIZER_API_WITH_DISALLOWED_DECORATOR"] = 1050] = "INITIALIZER_API_WITH_DISALLOWED_DECORATOR";
+  ErrorCode2[ErrorCode2["INITIALIZER_API_DECORATOR_METADATA_COLLISION"] = 1051] = "INITIALIZER_API_DECORATOR_METADATA_COLLISION";
+  ErrorCode2[ErrorCode2["INITIALIZER_API_NO_REQUIRED_FUNCTION"] = 1052] = "INITIALIZER_API_NO_REQUIRED_FUNCTION";
+  ErrorCode2[ErrorCode2["INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY"] = 1053] = "INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY";
+  ErrorCode2[ErrorCode2["DUPLICATE_BINDING_NAME"] = 1054] = "DUPLICATE_BINDING_NAME";
+  ErrorCode2[ErrorCode2["INCORRECTLY_DECLARED_ON_STATIC_MEMBER"] = 1100] = "INCORRECTLY_DECLARED_ON_STATIC_MEMBER";
+  ErrorCode2[ErrorCode2["COMPONENT_MISSING_TEMPLATE"] = 2001] = "COMPONENT_MISSING_TEMPLATE";
+  ErrorCode2[ErrorCode2["PIPE_MISSING_NAME"] = 2002] = "PIPE_MISSING_NAME";
+  ErrorCode2[ErrorCode2["PARAM_MISSING_TOKEN"] = -2003] = "PARAM_MISSING_TOKEN";
+  ErrorCode2[ErrorCode2["DIRECTIVE_MISSING_SELECTOR"] = 2004] = "DIRECTIVE_MISSING_SELECTOR";
+  ErrorCode2[ErrorCode2["UNDECORATED_PROVIDER"] = 2005] = "UNDECORATED_PROVIDER";
+  ErrorCode2[ErrorCode2["DIRECTIVE_INHERITS_UNDECORATED_CTOR"] = 2006] = "DIRECTIVE_INHERITS_UNDECORATED_CTOR";
+  ErrorCode2[ErrorCode2["UNDECORATED_CLASS_USING_ANGULAR_FEATURES"] = 2007] = "UNDECORATED_CLASS_USING_ANGULAR_FEATURES";
+  ErrorCode2[ErrorCode2["COMPONENT_RESOURCE_NOT_FOUND"] = 2008] = "COMPONENT_RESOURCE_NOT_FOUND";
+  ErrorCode2[ErrorCode2["COMPONENT_INVALID_SHADOW_DOM_SELECTOR"] = -2009] = "COMPONENT_INVALID_SHADOW_DOM_SELECTOR";
+  ErrorCode2[ErrorCode2["COMPONENT_NOT_STANDALONE"] = 2010] = "COMPONENT_NOT_STANDALONE";
+  ErrorCode2[ErrorCode2["COMPONENT_IMPORT_NOT_STANDALONE"] = 2011] = "COMPONENT_IMPORT_NOT_STANDALONE";
+  ErrorCode2[ErrorCode2["COMPONENT_UNKNOWN_IMPORT"] = 2012] = "COMPONENT_UNKNOWN_IMPORT";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_INVALID"] = 2013] = "HOST_DIRECTIVE_INVALID";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_NOT_STANDALONE"] = 2014] = "HOST_DIRECTIVE_NOT_STANDALONE";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_COMPONENT"] = 2015] = "HOST_DIRECTIVE_COMPONENT";
+  ErrorCode2[ErrorCode2["INJECTABLE_INHERITS_INVALID_CONSTRUCTOR"] = 2016] = "INJECTABLE_INHERITS_INVALID_CONSTRUCTOR";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_UNDEFINED_BINDING"] = 2017] = "HOST_DIRECTIVE_UNDEFINED_BINDING";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_CONFLICTING_ALIAS"] = 2018] = "HOST_DIRECTIVE_CONFLICTING_ALIAS";
+  ErrorCode2[ErrorCode2["HOST_DIRECTIVE_MISSING_REQUIRED_BINDING"] = 2019] = "HOST_DIRECTIVE_MISSING_REQUIRED_BINDING";
+  ErrorCode2[ErrorCode2["CONFLICTING_INPUT_TRANSFORM"] = 2020] = "CONFLICTING_INPUT_TRANSFORM";
+  ErrorCode2[ErrorCode2["COMPONENT_INVALID_STYLE_URLS"] = 2021] = "COMPONENT_INVALID_STYLE_URLS";
+  ErrorCode2[ErrorCode2["COMPONENT_UNKNOWN_DEFERRED_IMPORT"] = 2022] = "COMPONENT_UNKNOWN_DEFERRED_IMPORT";
+  ErrorCode2[ErrorCode2["NON_STANDALONE_NOT_ALLOWED"] = 2023] = "NON_STANDALONE_NOT_ALLOWED";
+  ErrorCode2[ErrorCode2["MISSING_NAMED_TEMPLATE_DEPENDENCY"] = 2024] = "MISSING_NAMED_TEMPLATE_DEPENDENCY";
+  ErrorCode2[ErrorCode2["INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE"] = 2025] = "INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE";
+  ErrorCode2[ErrorCode2["UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD"] = 2026] = "UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD";
+  ErrorCode2[ErrorCode2["COMPONENT_ANIMATIONS_CONFLICT"] = 2027] = "COMPONENT_ANIMATIONS_CONFLICT";
+  ErrorCode2[ErrorCode2["SERVICE_CONSTRUCTOR_DI"] = 2028] = "SERVICE_CONSTRUCTOR_DI";
+  ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
+  ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = -3003] = "IMPORT_CYCLE_DETECTED";
+  ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
+  ErrorCode2[ErrorCode2["CONFIG_FLAT_MODULE_NO_INDEX"] = 4001] = "CONFIG_FLAT_MODULE_NO_INDEX";
+  ErrorCode2[ErrorCode2["CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK"] = 4002] = "CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK";
+  ErrorCode2[ErrorCode2["CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES"] = 4003] = "CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES";
+  ErrorCode2[ErrorCode2["CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL"] = 4004] = "CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL";
+  ErrorCode2[ErrorCode2["CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK"] = 4005] = "CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK";
+  ErrorCode2[ErrorCode2["CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED"] = 4006] = "CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED";
+  ErrorCode2[ErrorCode2["HOST_BINDING_PARSE_ERROR"] = 5001] = "HOST_BINDING_PARSE_ERROR";
+  ErrorCode2[ErrorCode2["TEMPLATE_PARSE_ERROR"] = 5002] = "TEMPLATE_PARSE_ERROR";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_DECLARATION"] = 6001] = "NGMODULE_INVALID_DECLARATION";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_IMPORT"] = 6002] = "NGMODULE_INVALID_IMPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_EXPORT"] = 6003] = "NGMODULE_INVALID_EXPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_REEXPORT"] = 6004] = "NGMODULE_INVALID_REEXPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC"] = 6005] = "NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC";
+  ErrorCode2[ErrorCode2["NGMODULE_REEXPORT_NAME_COLLISION"] = 6006] = "NGMODULE_REEXPORT_NAME_COLLISION";
+  ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_NOT_UNIQUE"] = 6007] = "NGMODULE_DECLARATION_NOT_UNIQUE";
+  ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_IS_STANDALONE"] = 6008] = "NGMODULE_DECLARATION_IS_STANDALONE";
+  ErrorCode2[ErrorCode2["NGMODULE_BOOTSTRAP_IS_STANDALONE"] = 6009] = "NGMODULE_BOOTSTRAP_IS_STANDALONE";
+  ErrorCode2[ErrorCode2["WARN_NGMODULE_ID_UNNECESSARY"] = -6100] = "WARN_NGMODULE_ID_UNNECESSARY";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ELEMENT"] = -8001] = "SCHEMA_INVALID_ELEMENT";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ATTRIBUTE"] = -8002] = "SCHEMA_INVALID_ATTRIBUTE";
+  ErrorCode2[ErrorCode2["MISSING_REFERENCE_TARGET"] = -8003] = "MISSING_REFERENCE_TARGET";
+  ErrorCode2[ErrorCode2["MISSING_PIPE"] = 8004] = "MISSING_PIPE";
+  ErrorCode2[ErrorCode2["WRITE_TO_READ_ONLY_VARIABLE"] = 8005] = "WRITE_TO_READ_ONLY_VARIABLE";
+  ErrorCode2[ErrorCode2["DUPLICATE_VARIABLE_DECLARATION"] = 8006] = "DUPLICATE_VARIABLE_DECLARATION";
+  ErrorCode2[ErrorCode2["SPLIT_TWO_WAY_BINDING"] = 8007] = "SPLIT_TWO_WAY_BINDING";
+  ErrorCode2[ErrorCode2["MISSING_REQUIRED_INPUTS"] = 8008] = "MISSING_REQUIRED_INPUTS";
+  ErrorCode2[ErrorCode2["ILLEGAL_FOR_LOOP_TRACK_ACCESS"] = 8009] = "ILLEGAL_FOR_LOOP_TRACK_ACCESS";
+  ErrorCode2[ErrorCode2["INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT"] = 8010] = "INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT";
+  ErrorCode2[ErrorCode2["CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION"] = -8011] = "CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION";
+  ErrorCode2[ErrorCode2["DEFERRED_PIPE_USED_EAGERLY"] = 8012] = "DEFERRED_PIPE_USED_EAGERLY";
+  ErrorCode2[ErrorCode2["DEFERRED_DIRECTIVE_USED_EAGERLY"] = 8013] = "DEFERRED_DIRECTIVE_USED_EAGERLY";
+  ErrorCode2[ErrorCode2["DEFERRED_DEPENDENCY_IMPORTED_EAGERLY"] = 8014] = "DEFERRED_DEPENDENCY_IMPORTED_EAGERLY";
+  ErrorCode2[ErrorCode2["ILLEGAL_LET_WRITE"] = 8015] = "ILLEGAL_LET_WRITE";
+  ErrorCode2[ErrorCode2["LET_USED_BEFORE_DEFINITION"] = 8016] = "LET_USED_BEFORE_DEFINITION";
+  ErrorCode2[ErrorCode2["CONFLICTING_LET_DECLARATION"] = 8017] = "CONFLICTING_LET_DECLARATION";
+  ErrorCode2[ErrorCode2["UNCLAIMED_DIRECTIVE_BINDING"] = 8018] = "UNCLAIMED_DIRECTIVE_BINDING";
+  ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER"] = 8019] = "DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER";
+  ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER"] = 8020] = "DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER";
+  ErrorCode2[ErrorCode2["DEFER_TRIGGER_MISCONFIGURATION"] = 8021] = "DEFER_TRIGGER_MISCONFIGURATION";
+  ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
+  ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = -8023] = "MULTIPLE_MATCHING_COMPONENTS";
+  ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = -8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
+  ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_UNSUPPORTED_BINDING"] = 8025] = "FOREIGN_COMPONENT_UNSUPPORTED_BINDING";
+  ErrorCode2[ErrorCode2["INVALID_CONTENT_PLACEMENT"] = 8026] = "INVALID_CONTENT_PLACEMENT";
+  ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN"] = 8027] = "FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN";
+  ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_DECLARATION"] = 8028] = "CONFLICTING_CONTENT_DECLARATION";
+  ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_AND_PROPERTY"] = 8029] = "CONFLICTING_CONTENT_AND_PROPERTY";
+  ErrorCode2[ErrorCode2["UNCLAIMED_EVENT_BINDING"] = 8030] = "UNCLAIMED_EVENT_BINDING";
+  ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
+  ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
+  ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
+  ErrorCode2[ErrorCode2["TEXT_ATTRIBUTE_NOT_BINDING"] = 8104] = "TEXT_ATTRIBUTE_NOT_BINDING";
+  ErrorCode2[ErrorCode2["MISSING_NGFOROF_LET"] = 8105] = "MISSING_NGFOROF_LET";
+  ErrorCode2[ErrorCode2["SUFFIX_NOT_SUPPORTED"] = 8106] = "SUFFIX_NOT_SUPPORTED";
+  ErrorCode2[ErrorCode2["OPTIONAL_CHAIN_NOT_NULLABLE"] = 8107] = "OPTIONAL_CHAIN_NOT_NULLABLE";
+  ErrorCode2[ErrorCode2["SKIP_HYDRATION_NOT_STATIC"] = 8108] = "SKIP_HYDRATION_NOT_STATIC";
+  ErrorCode2[ErrorCode2["INTERPOLATED_SIGNAL_NOT_INVOKED"] = 8109] = "INTERPOLATED_SIGNAL_NOT_INVOKED";
+  ErrorCode2[ErrorCode2["UNSUPPORTED_INITIALIZER_API_USAGE"] = 8110] = "UNSUPPORTED_INITIALIZER_API_USAGE";
+  ErrorCode2[ErrorCode2["UNINVOKED_FUNCTION_IN_EVENT_BINDING"] = 8111] = "UNINVOKED_FUNCTION_IN_EVENT_BINDING";
+  ErrorCode2[ErrorCode2["UNUSED_LET_DECLARATION"] = 8112] = "UNUSED_LET_DECLARATION";
+  ErrorCode2[ErrorCode2["UNUSED_STANDALONE_IMPORTS"] = 8113] = "UNUSED_STANDALONE_IMPORTS";
+  ErrorCode2[ErrorCode2["UNPARENTHESIZED_NULLISH_COALESCING"] = 8114] = "UNPARENTHESIZED_NULLISH_COALESCING";
+  ErrorCode2[ErrorCode2["UNINVOKED_TRACK_FUNCTION"] = 8115] = "UNINVOKED_TRACK_FUNCTION";
+  ErrorCode2[ErrorCode2["MISSING_STRUCTURAL_DIRECTIVE"] = 8116] = "MISSING_STRUCTURAL_DIRECTIVE";
+  ErrorCode2[ErrorCode2["UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION"] = 8117] = "UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION";
+  ErrorCode2[ErrorCode2["FORBIDDEN_REQUIRED_INITIALIZER_INVOCATION"] = 8118] = "FORBIDDEN_REQUIRED_INITIALIZER_INVOCATION";
+  ErrorCode2[ErrorCode2["NUMERIC_CSS_PROPERTY_REQUIRES_UNIT"] = 8119] = "NUMERIC_CSS_PROPERTY_REQUIRES_UNIT";
+  ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
+  ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
+  ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
+  ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
+  ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
+  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNRESOLVED_CONST"] = 11001] = "LOCAL_COMPILATION_UNRESOLVED_CONST";
+  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION"] = 11003] = "LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_MISSING_NAME_PARAMETER"] = 11100] = "DEFER_BLOCK_MISSING_NAME_PARAMETER";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_UNKNOWN_NAME_PARAMETER"] = 11101] = "DEFER_BLOCK_UNKNOWN_NAME_PARAMETER";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_INVALID_NAME_PARAMETER"] = 11102] = "DEFER_BLOCK_INVALID_NAME_PARAMETER";
+})(ErrorCode || (ErrorCode = {}));
+
+// packages/compiler-cli/src/ngtsc/imports/src/core_symbols.js
+var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
+  ["\u0275\u0275defineInjectable", "\u0275\u0275defineInjectable"],
+  ["\u0275\u0275defineService", "\u0275\u0275defineService"],
+  ["\u0275\u0275defineInjector", "\u0275\u0275defineInjector"],
+  ["\u0275\u0275defineNgModule", "\u0275\u0275defineNgModule"],
+  ["\u0275\u0275setNgModuleScope", "\u0275\u0275setNgModuleScope"],
+  ["\u0275\u0275inject", "\u0275\u0275inject"],
+  ["\u0275\u0275FactoryDeclaration", "\u0275\u0275FactoryDeclaration"],
+  ["\u0275setClassMetadata", "setClassMetadata"],
+  ["\u0275setClassMetadataAsync", "setClassMetadataAsync"],
+  ["\u0275\u0275InjectableDeclaration", "\u0275\u0275InjectableDeclaration"],
+  ["\u0275\u0275InjectorDeclaration", "\u0275\u0275InjectorDeclaration"],
+  ["\u0275\u0275NgModuleDeclaration", "\u0275\u0275NgModuleDeclaration"],
+  ["\u0275NgModuleFactory", "NgModuleFactory"],
+  ["\u0275noSideEffects", "\u0275noSideEffects"]
+]);
+var CORE_MODULE = "@angular/core";
+function validateAndRewriteCoreSymbol(name) {
+  if (!CORE_SUPPORTED_SYMBOLS.has(name)) {
+    throw new Error(`Importing unexpected symbol ${name} while compiling ${CORE_MODULE}`);
+  }
+  return CORE_SUPPORTED_SYMBOLS.get(name);
+}
+
+// packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies_output.js
+import { outputAst as o } from "@angular/compiler";
+function extractHmrDependenciesFromOutput(className, output, visitor, availableTopLevel, resolver) {
+  const { definition, factory, deferBlockMetadata, classMetadata, debugInfo } = output;
+  definition.expression.visitExpression(visitor, null);
+  definition.statements.forEach((statement) => statement.visitStatement(visitor, null));
+  factory.initializer?.visitExpression(visitor, null);
+  factory.statements.forEach((statement) => statement.visitStatement(visitor, null));
+  classMetadata?.visitStatement(visitor, null);
+  debugInfo?.visitStatement(visitor, null);
+  if (deferBlockMetadata.mode === 0) {
+    deferBlockMetadata.blocks.forEach((loader) => loader?.visitExpression(visitor, null));
+  } else {
+    deferBlockMetadata.dependenciesFn?.visitExpression(visitor, null);
+  }
+  const local = [];
+  const seenLocals = /* @__PURE__ */ new Set();
+  for (const readNode of visitor.allReads) {
+    const readName = resolver.getName(readNode);
+    if (readName !== className && !seenLocals.has(readName) && availableTopLevel.has(readName)) {
+      const runtimeRepresentation = resolver.getRuntimeRepresentation(readNode);
+      if (runtimeRepresentation === null) {
+        return null;
+      }
+      local.push({ name: readName, runtimeRepresentation });
+      seenLocals.add(readName);
+    }
+  }
+  return {
+    local,
+    external: Array.from(visitor.namespaceReads, (name, index) => ({
+      moduleName: name,
+      assignedName: `\u0275hmr${index}`
+    }))
+  };
+}
+var PotentialTopLevelReadsVisitor = class extends o.RecursiveAstVisitor {
+  allReads = /* @__PURE__ */ new Set();
+  namespaceReads = /* @__PURE__ */ new Set();
+  // tslint:disable-next-line:no-any
+  visitExternalExpr(ast, context) {
+    if (ast.value.moduleName !== null) {
+      this.namespaceReads.add(ast.value.moduleName);
+    }
+    super.visitExternalExpr(ast, context);
+  }
+  // tslint:disable-next-line:no-any
+  visitReadVarExpr(ast, context) {
+    this.allReads.add(ast);
+    super.visitReadVarExpr(ast, context);
+  }
+  // tslint:disable-next-line:no-any
+  visitWrappedNodeExpr(ast, context) {
+    this.addWrappedNodeReads(ast.node);
+    super.visitWrappedNodeExpr(ast, context);
+  }
+};
+
+export {
+  ErrorCode,
+  CORE_MODULE,
+  validateAndRewriteCoreSymbol,
+  extractHmrDependenciesFromOutput,
+  PotentialTopLevelReadsVisitor
+};
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+/*!
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+//# sourceMappingURL=chunk-6PMVL4G6.js.map

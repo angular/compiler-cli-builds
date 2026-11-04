@@ -11,7 +11,6 @@ import {
   DynamicValue,
   EnumValue,
   Environment,
-  ErrorCode,
   ExpressionIdentifier,
   FatalDiagnosticError,
   ImportFlags,
@@ -84,11 +83,12 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-VPXF3SPH.js";
+} from "./chunk-RHMGQUPC.js";
 import {
+  ErrorCode,
   PotentialTopLevelReadsVisitor,
   extractHmrDependenciesFromOutput
-} from "./chunk-75X7ZOFT.js";
+} from "./chunk-6PMVL4G6.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -15052,4 +15052,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-AE6QUNTQ.js.map
+//# sourceMappingURL=chunk-EWA5Q6GF.js.map

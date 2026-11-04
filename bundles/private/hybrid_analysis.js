@@ -8,7 +8,7 @@ import {
   IndexingContext,
   generateIndexerAnalysis,
   getIndexerTemplateIdentifiers
-} from "../chunk-PJDDMTBK.js";
+} from "../chunk-LGAXIPQ2.js";
 import {
   Environment,
   ExpressionIdentifier,
@@ -18,12 +18,13 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-VPXF3SPH.js";
+} from "../chunk-RHMGQUPC.js";
 import {
+  ErrorCode,
   PotentialTopLevelReadsVisitor,
   extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-75X7ZOFT.js";
+} from "../chunk-6PMVL4G6.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
@@ -31,6 +32,7 @@ import "../chunk-IEBNHER4.js";
 export {
   AbsoluteSourceSpan,
   Environment,
+  ErrorCode,
   ExpressionIdentifier,
   IdentifierKind,
   ImportManager,

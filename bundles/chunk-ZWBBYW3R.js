@@ -50,7 +50,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-AE6QUNTQ.js";
+} from "./chunk-EWA5Q6GF.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -59,7 +59,6 @@ import {
   DefaultImportTracker,
   DeferredSymbolTracker,
   DtsMetadataReader,
-  ErrorCode,
   ExportedProviderStatusResolver,
   ExtendedTemplateDiagnosticName,
   FatalDiagnosticError,
@@ -99,7 +98,10 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-VPXF3SPH.js";
+} from "./chunk-RHMGQUPC.js";
+import {
+  ErrorCode
+} from "./chunk-6PMVL4G6.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5588,4 +5590,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-X3ET557S.js.map
+//# sourceMappingURL=chunk-ZWBBYW3R.js.map
