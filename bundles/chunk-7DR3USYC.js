@@ -1785,7 +1785,7 @@ var DiagnosticCategoryLabel;
 
 // packages/compiler-cli/src/ngtsc/core/src/compiler.js
 import { generateIndexerAnalysis, IndexingContext, LEGACY_OPTIONAL_CHAINING_DEFAULT } from "@angular/compiler";
-import ts29 from "typescript";
+import ts26 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
 var CycleAnalyzer = class {
@@ -2688,16 +2688,6 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     return this.diagnostics;
   }
 };
-function isAccessFromUncheckedIndex(node) {
-  if (node instanceof KeyedRead) {
-    return true;
-  } else if (node instanceof SafePropertyRead || node instanceof SafeKeyedRead || node instanceof SafeCall) {
-    return isAccessFromUncheckedIndex(node.receiver);
-  } else if (node instanceof ParenthesizedExpression || node instanceof NonNullAssert) {
-    return isAccessFromUncheckedIndex(node.expression);
-  }
-  return false;
-}
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/api/format-extended-error.js
 import { VERSION } from "@angular/compiler";
@@ -2967,57 +2957,6 @@ var factory5 = {
   create: () => new MissingStructuralDirectiveCheck()
 };
 
-// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.js
-import { Binary } from "@angular/compiler";
-import ts20 from "typescript";
-var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
-  noUncheckedIndexedAccess;
-  code = ErrorCode.NULLISH_COALESCING_NOT_NULLABLE;
-  constructor(noUncheckedIndexedAccess) {
-    super();
-    this.noUncheckedIndexedAccess = noUncheckedIndexedAccess;
-  }
-  visitNode(ctx, component, node) {
-    if (!(node instanceof Binary) || node.operation !== "??")
-      return [];
-    if (!this.noUncheckedIndexedAccess && isAccessFromUncheckedIndex(node.left)) {
-      return [];
-    }
-    const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.left, component);
-    if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
-      return [];
-    }
-    const typeLeft = ctx.templateTypeChecker.getTypeOfSymbol(symbolLeft);
-    if (!typeLeft || typeLeft.flags & (ts20.TypeFlags.Any | ts20.TypeFlags.Unknown)) {
-      return [];
-    }
-    if (typeLeft.getNonNullableType() !== typeLeft)
-      return [];
-    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-    if (symbol.kind !== SymbolKind.Expression) {
-      return [];
-    }
-    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
-    if (templateMapping === null) {
-      return [];
-    }
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, formatExtendedError(ErrorCode.NULLISH_COALESCING_NOT_NULLABLE, `The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed.`));
-    return [diagnostic];
-  }
-};
-var factory6 = {
-  code: ErrorCode.NULLISH_COALESCING_NOT_NULLABLE,
-  name: ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
-  create: (options) => {
-    const strictNullChecks = options.strictNullChecks === void 0 ? !!options.strict : !!options.strictNullChecks;
-    if (!strictNullChecks) {
-      return null;
-    }
-    const noUncheckedIndexedAccess = !!options.noUncheckedIndexedAccess;
-    return new NullishCoalescingNotNullableCheck(noUncheckedIndexedAccess);
-  }
-};
-
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/numeric_css_property_requires_unit/index.js
 import { ASTWithSource as ASTWithSource2, BindingType as BindingType2, LiteralPrimitive, TmplAstBoundAttribute as TmplAstBoundAttribute2, Unary } from "@angular/compiler";
 var CSS_LENGTH_PROPERTIES = /* @__PURE__ */ new Set([
@@ -3193,63 +3132,10 @@ function getNumericValue(ast) {
   }
   return null;
 }
-var factory7 = {
+var factory6 = {
   code: ErrorCode.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT,
   name: ExtendedTemplateDiagnosticName.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT,
   create: () => new NumericCssPropertyRequiresUnitCheck()
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
-import { SafeCall as SafeCall2, SafeKeyedRead as SafeKeyedRead2, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
-import ts21 from "typescript";
-var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
-  noUncheckedIndexedAccess;
-  code = ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE;
-  constructor(noUncheckedIndexedAccess) {
-    super();
-    this.noUncheckedIndexedAccess = noUncheckedIndexedAccess;
-  }
-  visitNode(ctx, component, node) {
-    if (!(node instanceof SafeCall2) && !(node instanceof SafePropertyRead2) && !(node instanceof SafeKeyedRead2)) {
-      return [];
-    }
-    if (!this.noUncheckedIndexedAccess && isAccessFromUncheckedIndex(node.receiver)) {
-      return [];
-    }
-    const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
-    if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
-      return [];
-    }
-    const typeLeft = ctx.templateTypeChecker.getTypeOfSymbol(symbolLeft);
-    if (!typeLeft || typeLeft.flags & (ts21.TypeFlags.Any | ts21.TypeFlags.Unknown)) {
-      return [];
-    }
-    if (typeLeft.getNonNullableType() !== typeLeft)
-      return [];
-    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-    if (symbol.kind !== SymbolKind.Expression) {
-      return [];
-    }
-    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
-    if (templateMapping === null) {
-      return [];
-    }
-    const advice = node instanceof SafePropertyRead2 ? `the '?.' operator can be replaced with the '.' operator` : `the '?.' operator can be safely removed`;
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, formatExtendedError(ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE, `The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore ${advice}`));
-    return [diagnostic];
-  }
-};
-var factory8 = {
-  code: ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE,
-  name: ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
-  create: (options) => {
-    const strictNullChecks = options.strictNullChecks === void 0 ? !!options.strict : !!options.strictNullChecks;
-    if (!strictNullChecks) {
-      return null;
-    }
-    const noUncheckedIndexedAccess = !!options.noUncheckedIndexedAccess;
-    return new OptionalChainNotNullableCheck(noUncheckedIndexedAccess);
-  }
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
@@ -3276,7 +3162,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory9 = {
+var factory7 = {
   code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
   name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
   create: () => new NgSkipHydrationSpec()
@@ -3297,7 +3183,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     return [ctx.makeTemplateDiagnostic(node.keySpan, SUFFIX_ERROR_MSG)];
   }
 };
-var factory10 = {
+var factory8 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
@@ -3338,14 +3224,14 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory11 = {
+var factory9 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3367,14 +3253,14 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
   }
 };
 function assertExpressionInvoked(expression, component, node, expressionText, ctx) {
-  if (expression instanceof Call || expression instanceof SafeCall3) {
+  if (expression instanceof Call || expression instanceof SafeCall2) {
     return [];
   }
   if (expression instanceof ArrowFunction) {
     const errorString = "Arrow function will not be invoked in this event listener. Did you intend to call a method?";
     return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
   }
-  if (!(expression instanceof PropertyRead2) && !(expression instanceof SafePropertyRead3)) {
+  if (!(expression instanceof PropertyRead2) && !(expression instanceof SafePropertyRead2)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
@@ -3391,20 +3277,20 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
 function generateStringFromExpression(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory12 = {
+var factory10 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   create: () => new UninvokedFunctionInEventBindingSpec()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unparenthesized_nullish_coalescing/index.js
-import { Binary as Binary2 } from "@angular/compiler";
+import { Binary } from "@angular/compiler";
 var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING;
   visitNode(ctx, component, node) {
-    if (node instanceof Binary2) {
+    if (node instanceof Binary) {
       if (node.operation === "&&" || node.operation === "||") {
-        if (node.left instanceof Binary2 && node.left.operation === "??" || node.right instanceof Binary2 && node.right.operation === "??") {
+        if (node.left instanceof Binary && node.left.operation === "??" || node.right instanceof Binary && node.right.operation === "??") {
           const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
           if (symbol?.kind !== SymbolKind.Expression) {
             return [];
@@ -3421,7 +3307,7 @@ var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory13 = {
+var factory11 = {
   code: ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING,
   name: ExtendedTemplateDiagnosticName.UNPARENTHESIZED_NULLISH_COALESCING,
   create: () => new UnparenthesizedNullishCoalescing()
@@ -3463,100 +3349,10 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     return this.analysis.get(node);
   }
 };
-var factory14 = {
+var factory12 = {
   code: ErrorCode.UNUSED_LET_DECLARATION,
   name: ExtendedTemplateDiagnosticName.UNUSED_LET_DECLARATION,
   create: () => new UnusedLetDeclarationCheck()
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.js
-import { Call as Call2, PropertyRead as PropertyRead3, SafeCall as SafeCall4, SafePropertyRead as SafePropertyRead4, TmplAstForLoopBlock } from "@angular/compiler";
-import ts22 from "typescript";
-var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
-  code = ErrorCode.UNINVOKED_TRACK_FUNCTION;
-  visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstForLoopBlock) || !node.trackBy) {
-      return [];
-    }
-    if (node.trackBy.ast instanceof Call2 || node.trackBy.ast instanceof SafeCall4) {
-      return [];
-    }
-    if (!(node.trackBy.ast instanceof PropertyRead3) && !(node.trackBy.ast instanceof SafePropertyRead4)) {
-      return [];
-    }
-    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
-    if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-      const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
-      if (type) {
-        const callSignatures = type.getCallSignatures();
-        if (callSignatures.length > 0) {
-          const hasParameters = callSignatures.some((sig) => sig.parameters.length > 0);
-          const tsSymbol = ctx.templateTypeChecker.getTsSymbolOfSymbol(symbol);
-          const isMethod = isMethodSymbol(tsSymbol, callSignatures);
-          if (hasParameters || isMethod) {
-            const fullExpressionText = generateStringFromExpression2(node.trackBy.ast, node.trackBy.source || "");
-            const errorString = formatExtendedError(ErrorCode.UNINVOKED_TRACK_FUNCTION, `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`);
-            return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
-          }
-        }
-      }
-    }
-    return [];
-  }
-};
-function isMethodSymbol(tsSymbol, callSignatures) {
-  if (tsSymbol !== null) {
-    if ((tsSymbol.flags & ts22.SymbolFlags.Method) !== 0) {
-      return true;
-    }
-    const declarations = tsSymbol.getDeclarations();
-    if (declarations !== void 0) {
-      if (declarations.some((decl) => ts22.isMethodDeclaration(decl) || ts22.isMethodSignature(decl))) {
-        return true;
-      }
-    }
-  }
-  return callSignatures.some((sig) => sig.declaration !== void 0 && (ts22.isMethodDeclaration(sig.declaration) || ts22.isMethodSignature(sig.declaration)));
-}
-function generateStringFromExpression2(expression, source) {
-  return source.substring(expression.span.start, expression.span.end);
-}
-var factory15 = {
-  code: ErrorCode.UNINVOKED_TRACK_FUNCTION,
-  name: ExtendedTemplateDiagnosticName.UNINVOKED_TRACK_FUNCTION,
-  create: () => new UninvokedTrackFunctionCheck()
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.js
-import { Interpolation as Interpolation2, PropertyRead as PropertyRead4, SafePropertyRead as SafePropertyRead5 } from "@angular/compiler";
-var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisitor {
-  code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
-  visitNode(ctx, component, node) {
-    if (node instanceof Interpolation2) {
-      return node.expressions.flatMap((item) => assertExpressionInvoked2(item, component, ctx));
-    }
-    return [];
-  }
-};
-function assertExpressionInvoked2(expression, component, ctx) {
-  if (!(expression instanceof PropertyRead4) && !(expression instanceof SafePropertyRead5)) {
-    return [];
-  }
-  const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
-  if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-    const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
-    if (type && type.getCallSignatures()?.length > 0) {
-      const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION, `Function in text interpolation should be invoked: ${expression.name}()`);
-      const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
-      return [ctx.makeTemplateDiagnostic(templateMapping.span, errorString)];
-    }
-  }
-  return [];
-}
-var factory16 = {
-  code: ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
-  name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
-  create: () => new UninvokedFunctionInTextInterpolation()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
@@ -3668,26 +3464,26 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
     return diags;
   }
 };
-var factory17 = {
+var factory13 = {
   code: ErrorCode.DEFER_TRIGGER_MISCONFIGURATION,
   name: ExtendedTemplateDiagnosticName.DEFER_TRIGGER_MISCONFIGURATION,
   create: () => new DeferTriggerMisconfiguration()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
-import ts23 from "typescript";
+import ts20 from "typescript";
 var ExtendedTemplateCheckerImpl = class {
   partialCtx;
   templateChecks;
   constructor(templateTypeChecker, typeChecker, templateCheckFactories, options) {
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory18 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory18.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
+    for (const factory14 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory14.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory18.create(options);
+      const check = factory14.create(options);
       if (check === null) {
         continue;
       }
@@ -3717,9 +3513,9 @@ var ExtendedTemplateCheckerImpl = class {
 function diagnosticLabelToCategory(label) {
   switch (label) {
     case DiagnosticCategoryLabel.Warning:
-      return ts23.DiagnosticCategory.Warning;
+      return ts20.DiagnosticCategory.Warning;
     case DiagnosticCategoryLabel.Error:
-      return ts23.DiagnosticCategory.Error;
+      return ts20.DiagnosticCategory.Error;
     case DiagnosticCategoryLabel.Suppress:
       return null;
     default:
@@ -3735,31 +3531,34 @@ ${value}`);
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory2,
   factory6,
-  factory7,
-  factory8,
   factory3,
-  factory11,
+  factory9,
   factory4,
   factory5,
-  factory10,
+  factory8,
   factory,
+  factory10,
   factory12,
-  factory14,
-  factory9,
-  factory13,
-  factory15,
-  factory16,
-  factory17
+  factory7,
+  factory11,
+  factory13
+];
+var DEPRECATED_DIAGNOSTICS = [
+  ExtendedTemplateDiagnosticName.UNINVOKED_TRACK_FUNCTION,
+  ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
+  ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
+  ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory18) => factory18.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory14) => factory14.name),
+  ...DEPRECATED_DIAGNOSTICS
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
-import ts24 from "typescript";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead3, Binary as Binary2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
+import ts21 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
   constructor(templateTypeChecker) {
@@ -3799,7 +3598,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.diagnostics = diagnostics;
   }
   visitBinary(ast, context) {
-    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead5) {
+    if (Binary2.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead3) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
     }
     super.visitBinary(ast, context);
@@ -3807,7 +3606,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   visitUnary(ast, context) {
     if (Unary2.isUpdateOperation(ast.operator)) {
       const target = unwrapWriteTarget(ast.expr);
-      if (target instanceof PropertyRead5) {
+      if (target instanceof PropertyRead3) {
         this.checkForIllegalWriteInEventBinding(target, context);
       }
     }
@@ -3850,7 +3649,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   }
   makeIllegalTemplateVarDiagnostic(target, expressionNode, errorMessage) {
     const span = target instanceof TmplAstVariable ? target.valueSpan || target.sourceSpan : target.sourceSpan;
-    return this.templateTypeChecker.makeTemplateDiagnostic(this.component, expressionNode.handlerSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.WRITE_TO_READ_ONLY_VARIABLE), errorMessage, [
+    return this.templateTypeChecker.makeTemplateDiagnostic(this.component, expressionNode.handlerSpan, ts21.DiagnosticCategory.Error, ngErrorCode(ErrorCode.WRITE_TO_READ_ONLY_VARIABLE), errorMessage, [
       {
         text: `'${target.name}' is declared here.`,
         start: span.start.offset,
@@ -3868,7 +3667,7 @@ function unwrapAstWithSource(ast) {
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
-import ts25 from "typescript";
+import ts22 from "typescript";
 var APIS_TO_CHECK = [
   INPUT_INITIALIZER_FN,
   MODEL_INITIALIZER_FN,
@@ -3888,13 +3687,13 @@ var InitializerApiUsageRule = class {
     });
   }
   checkNode(node) {
-    if (!ts25.isCallExpression(node)) {
+    if (!ts22.isCallExpression(node)) {
       return null;
     }
-    while (node.parent && (ts25.isParenthesizedExpression(node.parent) || ts25.isAsExpression(node.parent))) {
+    while (node.parent && (ts22.isParenthesizedExpression(node.parent) || ts22.isAsExpression(node.parent))) {
       node = node.parent;
     }
-    if (!node.parent || !ts25.isCallExpression(node)) {
+    if (!node.parent || !ts22.isCallExpression(node)) {
       return null;
     }
     const identifiedInitializer = tryParseInitializerApi(APIS_TO_CHECK, node, this.reflector, this.importedSymbolsTracker);
@@ -3902,12 +3701,12 @@ var InitializerApiUsageRule = class {
       return null;
     }
     const functionName = identifiedInitializer.api.functionName + (identifiedInitializer.isRequired ? ".required" : "");
-    if (ts25.isPropertyDeclaration(node.parent) && node.parent.initializer === node) {
+    if (ts22.isPropertyDeclaration(node.parent) && node.parent.initializer === node) {
       let closestClass = node.parent;
-      while (closestClass && !ts25.isClassDeclaration(closestClass)) {
+      while (closestClass && !ts22.isClassDeclaration(closestClass)) {
         closestClass = closestClass.parent;
       }
-      if (closestClass && ts25.isClassDeclaration(closestClass)) {
+      if (closestClass && ts22.isClassDeclaration(closestClass)) {
         const decorators = this.reflector.getDecoratorsOfDeclaration(closestClass);
         const isComponentOrDirective = decorators !== null && decorators.some((decorator) => {
           return decorator.import?.from === "@angular/core" && (decorator.name === "Component" || decorator.name === "Directive");
@@ -3920,7 +3719,7 @@ var InitializerApiUsageRule = class {
 };
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/unused_standalone_imports_rule.js
-import ts26 from "typescript";
+import ts23 from "typescript";
 var UnusedStandaloneImportsRule = class {
   templateTypeChecker;
   typeCheckingConfig;
@@ -3934,7 +3733,7 @@ var UnusedStandaloneImportsRule = class {
     return this.typeCheckingConfig.unusedStandaloneImports !== "suppress" && (this.importedSymbolsTracker.hasNamedImport(sourceFile, "Component", "@angular/core") || this.importedSymbolsTracker.hasNamespaceImport(sourceFile, "@angular/core"));
   }
   checkNode(node) {
-    if (!ts26.isClassDeclaration(node)) {
+    if (!ts23.isClassDeclaration(node)) {
       return null;
     }
     const metadata = this.templateTypeChecker.getDirectiveMetadata(node);
@@ -3950,8 +3749,8 @@ var UnusedStandaloneImportsRule = class {
     if (unused === null) {
       return null;
     }
-    const propertyAssignment = closestNode(metadata.rawImports, ts26.isPropertyAssignment);
-    const category = this.typeCheckingConfig.unusedStandaloneImports === "error" ? ts26.DiagnosticCategory.Error : ts26.DiagnosticCategory.Warning;
+    const propertyAssignment = closestNode(metadata.rawImports, ts23.isPropertyAssignment);
+    const category = this.typeCheckingConfig.unusedStandaloneImports === "error" ? ts23.DiagnosticCategory.Error : ts23.DiagnosticCategory.Warning;
     if (unused.length === metadata.imports.length && propertyAssignment !== null) {
       return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, propertyAssignment.name, "All imports are unused", void 0, category);
     }
@@ -3995,8 +3794,8 @@ var UnusedStandaloneImportsRule = class {
     }
     let current = reference.getIdentityIn(rawImports.getSourceFile());
     while (current !== null) {
-      if (ts26.isVariableStatement(current)) {
-        return !!current.modifiers?.some((m) => m.kind === ts26.SyntaxKind.ExportKeyword);
+      if (ts23.isVariableStatement(current)) {
+        return !!current.modifiers?.some((m) => m.kind === ts23.SyntaxKind.ExportKeyword);
       }
       current = current.parent ?? null;
     }
@@ -4016,7 +3815,7 @@ function closestNode(start, predicate) {
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/forbidden_required_initializer_invocation_rule.js
-import ts27 from "typescript";
+import ts24 from "typescript";
 var APIS_TO_CHECK2 = [
   INPUT_INITIALIZER_FN,
   MODEL_INITIALIZER_FN,
@@ -4035,12 +3834,12 @@ var ForbiddenRequiredInitializersInvocationRule = class {
     });
   }
   checkNode(node) {
-    if (!ts27.isClassDeclaration(node))
+    if (!ts24.isClassDeclaration(node))
       return null;
-    const requiredInitializerDeclarations = node.members.filter((m) => ts27.isPropertyDeclaration(m) && this.isPropDeclarationARequiredInitializer(m));
+    const requiredInitializerDeclarations = node.members.filter((m) => ts24.isPropertyDeclaration(m) && this.isPropDeclarationARequiredInitializer(m));
     const diagnostics = [];
     for (let decl of node.members) {
-      if (!ts27.isPropertyDeclaration(decl))
+      if (!ts24.isPropertyDeclaration(decl))
         continue;
       const initiallizerExpr = decl.initializer;
       if (!initiallizerExpr)
@@ -4048,10 +3847,10 @@ var ForbiddenRequiredInitializersInvocationRule = class {
       checkForbiddenInvocation(initiallizerExpr);
     }
     function checkForbiddenInvocation(node2) {
-      if (ts27.isArrowFunction(node2) || ts27.isFunctionExpression(node2))
+      if (ts24.isArrowFunction(node2) || ts24.isFunctionExpression(node2))
         return;
-      if (ts27.isPropertyAccessExpression(node2) && node2.expression.kind === ts27.SyntaxKind.ThisKeyword && // With the following we make sure we only flag invoked required initializers
-      ts27.isCallExpression(node2.parent) && node2.parent.expression === node2) {
+      if (ts24.isPropertyAccessExpression(node2) && node2.expression.kind === ts24.SyntaxKind.ThisKeyword && // With the following we make sure we only flag invoked required initializers
+      ts24.isCallExpression(node2.parent) && node2.parent.expression === node2) {
         const requiredProp = requiredInitializerDeclarations.find((prop) => prop.name.getText() === node2.name.getText());
         if (requiredProp) {
           const initializerFn = requiredProp.initializer.expression.expression.getText();
@@ -4076,7 +3875,7 @@ var ForbiddenRequiredInitializersInvocationRule = class {
   }
 };
 function getConstructorFromClass(node) {
-  return node.members.find((m) => ts27.isConstructorDeclaration(m) && m.body !== void 0);
+  return node.members.find((m) => ts24.isConstructorDeclaration(m) && m.body !== void 0);
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.js
@@ -4126,7 +3925,7 @@ var SourceFileValidator = class {
 
 // packages/compiler-cli/src/ngtsc/annotations/src/service.js
 import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareServiceFromMetadata, compileService, FactoryTarget, WrappedNodeExpr } from "@angular/compiler";
-import ts28 from "typescript";
+import ts25 from "typescript";
 var ServiceDecoratorHandler = class {
   reflector;
   evaluator;
@@ -4239,17 +4038,17 @@ var ServiceDecoratorHandler = class {
       };
     } else if (decorator.args.length === 1) {
       const metaNode = decorator.args[0];
-      if (!ts28.isObjectLiteralExpression(metaNode)) {
+      if (!ts25.isObjectLiteralExpression(metaNode)) {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, "@Service argument must be an object literal");
       }
       const meta = reflectObjectLiteral(metaNode);
       let autoProvided;
       if (meta.has("autoProvided")) {
         const value = meta.get("autoProvided");
-        if (value.kind !== ts28.SyntaxKind.TrueKeyword && value.kind !== ts28.SyntaxKind.FalseKeyword) {
+        if (value.kind !== ts25.SyntaxKind.TrueKeyword && value.kind !== ts25.SyntaxKind.FalseKeyword) {
           throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, metaNode, "`autoProvided` property must be a boolean literal");
         }
-        autoProvided = value.kind === ts28.SyntaxKind.TrueKeyword;
+        autoProvided = value.kind === ts25.SyntaxKind.TrueKeyword;
       }
       const result = { name, type, typeArgumentCount, autoProvided };
       if (meta.has("factory")) {
@@ -4457,7 +4256,7 @@ var NgCompiler = class _NgCompiler {
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
     this.entryPoint = adapter.entryPoint !== null ? getSourceFileOrNull(inputProgram, adapter.entryPoint) : null;
-    const moduleResolutionCache = ts29.createModuleResolutionCache(
+    const moduleResolutionCache = ts26.createModuleResolutionCache(
       this.adapter.getCurrentDirectory(),
       // doen't retain a reference to `this`, if other closures in the constructor here reference
       // `this` internally then a closure created here would retain them. This can cause major
@@ -4505,7 +4304,7 @@ var NgCompiler = class _NgCompiler {
       }
       for (const clazz of classesToUpdate) {
         this.compilation.traitCompiler.updateResources(clazz);
-        if (!ts29.isClassDeclaration(clazz)) {
+        if (!ts26.isClassDeclaration(clazz)) {
           continue;
         }
         this.compilation.templateTypeChecker.invalidateClass(clazz);
@@ -4720,12 +4519,12 @@ var NgCompiler = class _NgCompiler {
     if (compilation.supportJitMode && compilation.jitDeclarationRegistry.jitDeclarations.size > 0) {
       const { jitDeclarations } = compilation.jitDeclarationRegistry;
       const jitDeclarationsArray = Array.from(jitDeclarations);
-      const jitDeclarationOriginalNodes = new Set(jitDeclarationsArray.map((d) => ts29.getOriginalNode(d)));
+      const jitDeclarationOriginalNodes = new Set(jitDeclarationsArray.map((d) => ts26.getOriginalNode(d)));
       const sourceFilesWithJit = new Set(jitDeclarationsArray.map((d) => d.getSourceFile().fileName));
       before.push((ctx) => {
         const reflectionHost = new TypeScriptReflectionHost(this.inputProgram.getTypeChecker());
         const jitTransform = angularJitApplicationTransform(this.inputProgram, compilation.isCore, (node) => {
-          node = ts29.getOriginalNode(node, ts29.isClassDeclaration);
+          node = ts26.getOriginalNode(node, ts26.isClassDeclaration);
           return reflectionHost.isClass(node) && jitDeclarationOriginalNodes.has(node);
         })(ctx);
         return (sourceFile) => {
@@ -4760,7 +4559,7 @@ var NgCompiler = class _NgCompiler {
     compilation.traitCompiler.index(context);
     const adapter = {
       getName(node) {
-        return ts29.isClassDeclaration(node) && node.name ? node.name.getText() : "";
+        return ts26.isClassDeclaration(node) && node.name ? node.name.getText() : "";
       },
       getFileName(node) {
         return node.getSourceFile().fileName;
@@ -4812,16 +4611,16 @@ var NgCompiler = class _NgCompiler {
       return null;
     }
     const sourceFile = node.getSourceFile();
-    const printer = ts29.createPrinter();
-    const nodeText = printer.printNode(ts29.EmitHint.Unspecified, callback, sourceFile);
-    return ts29.transpileModule(nodeText, {
+    const printer = ts26.createPrinter();
+    const nodeText = printer.printNode(ts26.EmitHint.Unspecified, callback, sourceFile);
+    return ts26.transpileModule(nodeText, {
       compilerOptions: {
         ...this.options,
         // Some module types can produce additional code (see #60795) whereas we need the
         // HMR update module to use a native `export`. Override the `target` and `module`
         // to ensure that it looks as expected.
-        module: ts29.ModuleKind.ES2022,
-        target: ts29.ScriptTarget.ES2022
+        module: ts26.ModuleKind.ES2022,
+        target: ts26.ScriptTarget.ES2022
       },
       fileName: sourceFile.fileName,
       reportDiagnostics: false
@@ -5204,18 +5003,18 @@ function isAngularCorePackage(program) {
     return false;
   }
   return r3Symbols.statements.some((stmt) => {
-    if (!ts29.isVariableStatement(stmt)) {
+    if (!ts26.isVariableStatement(stmt)) {
       return false;
     }
-    const modifiers = ts29.getModifiers(stmt);
-    if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts29.SyntaxKind.ExportKeyword)) {
+    const modifiers = ts26.getModifiers(stmt);
+    if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts26.SyntaxKind.ExportKeyword)) {
       return false;
     }
     return stmt.declarationList.declarations.some((decl) => {
-      if (!ts29.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
+      if (!ts26.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
         return false;
       }
-      if (decl.initializer === void 0 || decl.initializer.kind !== ts29.SyntaxKind.TrueKeyword) {
+      if (decl.initializer === void 0 || decl.initializer.kind !== ts26.SyntaxKind.TrueKeyword) {
         return false;
       }
       return true;
@@ -5228,7 +5027,7 @@ function getR3SymbolsFile(program) {
 function* verifyCompatibleTypeCheckOptions(options) {
   if (options.extendedDiagnostics && options.strictTemplates === false) {
     yield makeConfigDiagnostic({
-      category: ts29.DiagnosticCategory.Error,
+      category: ts26.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES,
       messageText: `
 Angular compiler option "extendedDiagnostics" is configured, however "strictTemplates" is disabled.
@@ -5245,7 +5044,7 @@ One of the following actions is required:
   const defaultCategory = options.extendedDiagnostics?.defaultCategory;
   if (defaultCategory && !allowedCategoryLabels.includes(defaultCategory)) {
     yield makeConfigDiagnostic({
-      category: ts29.DiagnosticCategory.Error,
+      category: ts26.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
       messageText: `
 Angular compiler option "extendedDiagnostics.defaultCategory" has an unknown diagnostic category: "${defaultCategory}".
@@ -5258,7 +5057,7 @@ ${allowedCategoryLabels.join("\n")}
   for (const [checkName, category] of Object.entries(options.extendedDiagnostics?.checks ?? {})) {
     if (!SUPPORTED_DIAGNOSTIC_NAMES.has(checkName)) {
       yield makeConfigDiagnostic({
-        category: ts29.DiagnosticCategory.Error,
+        category: ts26.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks" has an unknown check: "${checkName}".
@@ -5270,7 +5069,7 @@ ${Array.from(SUPPORTED_DIAGNOSTIC_NAMES).join("\n")}
     }
     if (!allowedCategoryLabels.includes(category)) {
       yield makeConfigDiagnostic({
-        category: ts29.DiagnosticCategory.Error,
+        category: ts26.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks['${checkName}']" has an unknown diagnostic category: "${category}".
@@ -5288,7 +5087,7 @@ function verifyEmitDeclarationOnly(options) {
   }
   return [
     makeConfigDiagnostic({
-      category: ts29.DiagnosticCategory.Error,
+      category: ts26.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED,
       messageText: 'TS compiler option "emitDeclarationOnly" is not supported.'
     })
@@ -5313,7 +5112,7 @@ var ReferenceGraphAdapter = class {
     for (const { node } of references) {
       let sourceFile = node.getSourceFile();
       if (sourceFile === void 0) {
-        sourceFile = ts29.getOriginalNode(node).getSourceFile();
+        sourceFile = ts26.getOriginalNode(node).getSourceFile();
       }
       if (sourceFile === void 0 || !isDtsPath(sourceFile.fileName)) {
         this.graph.add(source, node);
@@ -5357,7 +5156,7 @@ function versionMapFromProgram(program, driver) {
 }
 
 // packages/compiler-cli/src/ngtsc/core/src/host.js
-import ts30 from "typescript";
+import ts27 from "typescript";
 var DelegatingCompilerHost = class {
   delegate;
   createHash;
@@ -5495,7 +5294,7 @@ var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
       entryPoint = findFlatIndexEntryPoint(normalizedTsInputFiles);
       if (entryPoint === null) {
         diagnostics.push({
-          category: ts30.DiagnosticCategory.Error,
+          category: ts27.DiagnosticCategory.Error,
           code: ngErrorCode(ErrorCode.CONFIG_FLAT_MODULE_NO_INDEX),
           file: void 0,
           start: void 0,
@@ -5549,10 +5348,10 @@ var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
     return this.fileNameToModuleName !== void 0 ? this : null;
   }
   createCachedResolveModuleNamesFunction() {
-    const moduleResolutionCache = ts30.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
+    const moduleResolutionCache = ts27.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
     return (moduleNames, containingFile, reusedNames, redirectedReference, options) => {
       return moduleNames.map((moduleName) => {
-        const module = ts30.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
+        const module = ts27.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
         return module.resolvedModule;
       });
     };
@@ -5590,4 +5389,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-C4TFYVH4.js.map
+//# sourceMappingURL=chunk-7DR3USYC.js.map

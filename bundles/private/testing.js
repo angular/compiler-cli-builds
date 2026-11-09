@@ -529,20 +529,6 @@ var NGP_INTENTIONAL_BEHAVIOR_DIFFERENCES = /* @__PURE__ */ new Set([
   // Tests TypeScript `structureIsReused` across in-memory ngtsc incremental compilations.
   "ngtsc type checking stability should allow for complete program reuse during incremental compilations",
   // Extended diagnostics that won't be ported to the new compilation model
-  "ngtsc extended template checks should produce nullish coalescing not nullable warning",
-  "should produce optional chain warning for chained property access",
-  "NullishCoalescingNotNullableCheck does not warn for pipe arguments when parens are used",
-  "NullishCoalescingNotNullableCheck should produce nullish coalescing warning",
-  "NullishCoalescingNotNullableCheck should produce nullish coalescing warning for classes with inline TCBs",
-  "NullishCoalescingNotNullableCheck should respect configured diagnostic category",
-  'NullishCoalescingNotNullableCheck warns for pipe arguments which are likely configured incorrectly (?? operates on "format" here)',
-  "OptionalChainNotNullableCheck should produce optional chain warning for classes with inline TCBs",
-  "OptionalChainNotNullableCheck should produce optional chain warning for indexed access",
-  "OptionalChainNotNullableCheck should produce optional chain warning for method call",
-  "OptionalChainNotNullableCheck should produce optional chain warning for property access",
-  "OptionalChainNotNullableCheck should respect configured diagnostic category",
-  "Uninvoked function in text interpolation compiler check should produce a warning when a function is not invoked in text interpolation",
-  "Uninvoked function in text interpolation compiler check should produce a warning when a property method is not invoked in text interpolation (with and without safe navigation)",
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a function in a chain is not invoked",
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a function in a function is not invoked",
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a function in an event binding is not invoked",
@@ -551,11 +537,7 @@ var NGP_INTENTIONAL_BEHAVIOR_DIFFERENCES = /* @__PURE__ */ new Set([
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a nested function in a conditional is not invoked",
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a nested function in an event binding is not invoked",
   "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when a nested function that uses key read in an event binding is not invoked",
-  "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when no function in a conditional is not invoked",
-  "UninvokedTrackFunctionCheck should produce a diagnostic when a track function in a @for block is not invoked",
-  "UninvokedTrackFunctionCheck should produce a warning when track is a method on an item",
-  "UninvokedTrackFunctionCheck should produce a warning when track is a regular function on an object",
-  "UninvokedTrackFunctionCheck should produce a warning when track is an arrow function property on component"
+  "UninvokedFunctionInEventBindingFactoryCheck should produce a diagnostic when no function in a conditional is not invoked"
 ]);
 var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "import generation should report an error when a library entry-point does not export the symbol",
