@@ -83,12 +83,12 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-RHMGQUPC.js";
+} from "./chunk-SNJY7KMC.js";
 import {
   ErrorCode,
   PotentialTopLevelReadsVisitor,
   extractHmrDependenciesFromOutput
-} from "./chunk-6PMVL4G6.js";
+} from "./chunk-MLQGKKBD.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -15052,4 +15052,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EWA5Q6GF.js.map
+//# sourceMappingURL=chunk-UR62SBZU.js.map

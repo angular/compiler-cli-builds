@@ -18,13 +18,13 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-RHMGQUPC.js";
+} from "../chunk-SNJY7KMC.js";
 import {
   ErrorCode,
   PotentialTopLevelReadsVisitor,
   extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-6PMVL4G6.js";
+} from "../chunk-MLQGKKBD.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";

@@ -7,7 +7,7 @@ import {
   PotentialTopLevelReadsVisitor,
   extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-6PMVL4G6.js";
+} from "../chunk-MLQGKKBD.js";
 import "../chunk-IEBNHER4.js";
 export {
   ErrorCode,
