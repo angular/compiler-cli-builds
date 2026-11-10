@@ -3426,7 +3426,17 @@ function extractHostBindings(members, evaluator, coreModule, compilationMode, ho
           }
         }
       }
-      bindings.properties[hostPropertyName] = getSafePropertyAccessString("this", member.name);
+      const hostPropertyValue = getSafePropertyAccessString("this", member.name);
+      const errors = verifyHostBindings({
+        attributes: {},
+        listeners: {},
+        properties: { [hostPropertyName]: hostPropertyValue },
+        specialAttributes: {}
+      }, createSourceSpan(decorator.node));
+      if (errors.length > 0) {
+        throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, decorator.node, errors.map((error) => error.msg).join("\n"));
+      }
+      bindings.properties[hostPropertyName] = hostPropertyValue;
     });
   });
   filterToMembersWithDecorator(members, "HostListener", coreModule).forEach(({ member, decorators }) => {
@@ -15052,4 +15062,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UR62SBZU.js.map
+//# sourceMappingURL=chunk-ZCUYY4IM.js.map

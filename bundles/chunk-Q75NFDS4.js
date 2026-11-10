@@ -451,13 +451,13 @@ import { ChangeDetectionStrategy, compileComponentFromMetadata, makeBindingParse
 import semver3 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
-import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
+import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan, verifyHostBindings } from "@angular/compiler";
 import semver2 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.3.0-next.4+sha-0dafb36";
+var PLACEHOLDER_VERSION = "22.3.0-next.4+sha-225d600";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -538,12 +538,20 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
   if (typeName === null) {
     throw new FatalLinkerError(typeExpr.expression, "Unsupported type, its name could not be determined");
   }
+  const host = toHostMetadata(metaObj);
+  if (metaObj.has("host")) {
+    const hostMeta = metaObj.getValue("host");
+    const errors = verifyHostBindings(host, createSourceSpan(hostMeta.getRange(), code, sourceUrl));
+    if (errors.length > 0) {
+      throw new FatalLinkerError(hostMeta.expression, errors.map((error) => error.msg).join("\n"));
+    }
+  }
   return {
     typeSourceSpan: createSourceSpan(typeExpr.getRange(), code, sourceUrl),
     type: wrapReference(typeExpr.getOpaque()),
     typeArgumentCount: 0,
     deps: null,
-    host: toHostMetadata(metaObj),
+    host,
     inputs: metaObj.has("inputs") ? metaObj.getObject("inputs").toLiteral(toInputMapping) : {},
     outputs: metaObj.has("outputs") ? metaObj.getObject("outputs").toLiteral((value) => value.getString()) : {},
     queries: metaObj.has("queries") ? metaObj.getArray("queries").map((entry) => toQueryMetadata(entry.getObject())) : [],
@@ -1404,4 +1412,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-C3GA6PEI.js.map
+//# sourceMappingURL=chunk-Q75NFDS4.js.map
