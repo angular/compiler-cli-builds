@@ -28,7 +28,6 @@ import {
   PerfPhase,
   PipeDecoratorHandler,
   QUERY_INITIALIZER_FNS,
-  SelectorlessComponentScopeReader,
   SemanticDepGraphUpdater,
   ShimAdapter,
   ShimReferenceTagger,
@@ -50,7 +49,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-2KW3AGDI.js";
+} from "./chunk-6BED3EY2.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -98,10 +97,10 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-AMVKU6WJ.js";
+} from "./chunk-MLEQ2TEM.js";
 import {
   ErrorCode
-} from "./chunk-GRXOHCCP.js";
+} from "./chunk-JSEB7RQH.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -2507,7 +2506,7 @@ var StandaloneComponentScopeReader = class {
     if (!this.cache.has(clazz)) {
       const clazzRef = new Reference(clazz);
       const clazzMeta = this.metaReader.getDirectiveMetadata(clazzRef);
-      if (clazzMeta === null || !clazzMeta.isComponent || !clazzMeta.isStandalone || clazzMeta.selectorlessEnabled) {
+      if (clazzMeta === null || !clazzMeta.isComponent || !clazzMeta.isStandalone) {
         this.cache.set(clazz, null);
         return null;
       }
@@ -2676,7 +2675,6 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
       this.visitAllTemplateNodes(template.inputs);
       this.visitAllTemplateNodes(template.outputs);
     }
-    this.visitAllTemplateNodes(template.directives);
     this.visitAllTemplateNodes(template.templateAttrs);
     this.visitAllTemplateNodes(template.variables);
     this.visitAllTemplateNodes(template.references);
@@ -4202,7 +4200,6 @@ var NgCompiler = class _NgCompiler {
   angularCoreVersion;
   enableHmr;
   implicitStandaloneValue;
-  enableSelectorless;
   emitDeclarationOnly;
   enableTemplateSourceLocations;
   /**
@@ -4247,7 +4244,6 @@ var NgCompiler = class _NgCompiler {
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || !!options._enableTemplateTypeChecker;
     this.enableBlockSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.0.0");
     this.enableLetSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 18.1.0");
-    this.enableSelectorless = options["_enableSelectorless"] ?? false;
     this.enableTemplateSourceLocations = options["enableTemplateSourceLocations"] ?? false;
     this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._experimentalAllowEmitDeclarationOnly;
     this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
@@ -4909,10 +4905,8 @@ var NgCompiler = class _NgCompiler {
     const ngModuleIndex = new NgModuleIndexImpl(metaReader, localMetaReader);
     const ngModuleScopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
     const standaloneScopeReader = new StandaloneComponentScopeReader(metaReader, ngModuleScopeRegistry, depScopeReader);
-    const selectorlessScopeReader = new SelectorlessComponentScopeReader(metaReader, reflector);
     const scopeReader = new CompoundComponentScopeReader([
       ngModuleScopeRegistry,
-      selectorlessScopeReader,
       standaloneScopeReader
     ]);
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
@@ -4954,7 +4948,7 @@ var NgCompiler = class _NgCompiler {
     }
     const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.options.i18nPreserveWhitespaceForLegacyExtraction ?? true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings, this.enableSelectorless, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT, this.enableTemplateSourceLocations),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.options.i18nPreserveWhitespaceForLegacyExtraction ?? true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT, this.enableTemplateSourceLocations),
       // TODO(alxhub): understand why the cast here is necessary (something to do with `null`
       // not being assignable to `unknown` when wrapped in `Readonly`).
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, !!this.options.strictStandalone, this.implicitStandaloneValue, this.usePoisonedData, typeCheckHostBindings, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT),
@@ -5389,4 +5383,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VJNNEJB6.js.map
+//# sourceMappingURL=chunk-RXCPTZ7D.js.map

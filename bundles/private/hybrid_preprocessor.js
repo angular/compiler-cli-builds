@@ -5,7 +5,7 @@
 import {
   ErrorCode,
   validateAndRewriteCoreSymbol
-} from "../chunk-GRXOHCCP.js";
+} from "../chunk-JSEB7RQH.js";
 import "../chunk-IEBNHER4.js";
 
 // packages/compiler-cli/private/hybrid_preprocessor.ts

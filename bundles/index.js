@@ -10,7 +10,7 @@ import {
   extractHmrDependenciesFromOutput,
   generateIndexerAnalysis,
   getIndexerTemplateIdentifiers
-} from "./chunk-ASWX3JX2.js";
+} from "./chunk-5IEYX442.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -26,7 +26,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-FVHYK2EM.js";
+} from "./chunk-UL2YGB4S.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -46,7 +46,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-VJNNEJB6.js";
+} from "./chunk-RXCPTZ7D.js";
 import {
   ActivePerfRecorder,
   InliningMode,
@@ -57,7 +57,7 @@ import {
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isShim
-} from "./chunk-2KW3AGDI.js";
+} from "./chunk-6BED3EY2.js";
 import {
   CompletionKind,
   Environment,
@@ -79,11 +79,11 @@ import {
   isLocalCompilationDiagnostics,
   isNamedClassDeclaration,
   ngErrorCode
-} from "./chunk-AMVKU6WJ.js";
+} from "./chunk-MLEQ2TEM.js";
 import {
   ErrorCode,
   validateAndRewriteCoreSymbol
-} from "./chunk-GRXOHCCP.js";
+} from "./chunk-JSEB7RQH.js";
 import "./chunk-2RWOSWE5.js";
 import {
   InvalidFileSystem,
@@ -114,7 +114,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.3.0-next.4+sha-a3bc172");
+var VERSION = new Version("22.3.0-next.4+sha-98b0f3b");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {

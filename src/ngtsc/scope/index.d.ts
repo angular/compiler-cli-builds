@@ -9,6 +9,5 @@ export { ComponentScopeKind, ComponentScopeReader, ExportScope, LocalModuleScope
 export { CompoundComponentScopeReader } from './src/component_scope';
 export { DtsModuleScopeResolver, MetadataDtsModuleScopeResolver } from './src/dependency';
 export { DeclarationData, LocalModuleScopeRegistry, LocalNgModuleData } from './src/local';
-export { SelectorlessComponentScopeReader } from './src/selectorless_scope';
 export { TypeCheckScope, TypeCheckScopeRegistry } from './src/typecheck';
 export { makeNotStandaloneDiagnostic, makeUnknownComponentImportDiagnostic } from './src/util';

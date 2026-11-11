@@ -6,7 +6,7 @@ import {
   CORE_MODULE,
   ErrorCode,
   validateAndRewriteCoreSymbol
-} from "./chunk-GRXOHCCP.js";
+} from "./chunk-JSEB7RQH.js";
 import {
   Context,
   ExpressionTranslatorVisitor
@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-a3bc172";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-98b0f3b";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3488,7 +3488,6 @@ var DtsMetadataReader = class {
     const inputs = ClassPropertyMapping.fromMappedObject(readInputsType(def.type.typeArguments[3]));
     const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
     const hostDirectives = def.type.typeArguments.length > 8 ? readHostDirectivesType(this.checker, def.type.typeArguments[8], ref.bestGuessOwningModule) : null;
-    const isSignal = def.type.typeArguments.length > 9 && (readBooleanType(def.type.typeArguments[9]) ?? false);
     const isPoisoned = hostDirectives !== null && hostDirectives?.isIncomplete;
     return {
       kind: MetaKind.Directive,
@@ -3509,7 +3508,6 @@ var DtsMetadataReader = class {
       animationTriggerNames: null,
       ngContentSelectors,
       isStandalone,
-      isSignal,
       // We do not transfer information about inputs from class metadata
       // via `.d.ts` declarations. This is fine because this metadata is
       // currently only used for classes defined in source files. E.g. in migrations.
@@ -3530,11 +3528,7 @@ var DtsMetadataReader = class {
       // used to increase the accuracy of a diagnostic.
       preserveWhitespaces: false,
       isExplicitlyDeferred: false,
-      deferredBlocks: null,
-      // We don't need to know if imported components from .d.ts
-      // files are selectorless for type-checking purposes.
-      selectorlessEnabled: false,
-      localReferencedSymbols: null
+      deferredBlocks: null
     };
   }
   /**
@@ -5330,8 +5324,6 @@ var SymbolKind;
   SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
   SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
   SymbolKind2[SymbolKind2["LetDeclaration"] = 11] = "LetDeclaration";
-  SymbolKind2[SymbolKind2["SelectorlessComponent"] = 12] = "SelectorlessComponent";
-  SymbolKind2[SymbolKind2["SelectorlessDirective"] = 13] = "SelectorlessDirective";
 })(SymbolKind || (SymbolKind = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
@@ -6043,7 +6035,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
+import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
 import ts33 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
@@ -6097,10 +6089,6 @@ var SymbolBuilder = class {
       symbol = this.getSymbolOfBoundEvent(node);
     } else if (node instanceof TmplAstElement) {
       symbol = this.getSymbolOfElement(node);
-    } else if (node instanceof TmplAstComponent) {
-      symbol = this.getSymbolOfSelectorlessComponent(node);
-    } else if (node instanceof TmplAstDirective) {
-      symbol = this.getSymbolOfSelectorlessDirective(node);
     } else if (node instanceof TmplAstTemplate) {
       symbol = this.getSymbolOfAstTemplate(node);
     } else if (node instanceof TmplAstVariable) {
@@ -6140,48 +6128,20 @@ var SymbolBuilder = class {
       templateNode: element
     };
   }
-  getSymbolOfSelectorlessComponent(node) {
-    const directives = this.getDirectivesOfNode(node);
-    const primaryDirective = directives.find((dir) => dir.matchSource === MatchSource3.Selector && dir.isComponent) ?? null;
-    if (primaryDirective === null) {
-      return null;
-    }
-    return {
-      tcbLocation: primaryDirective.tcbLocation,
-      kind: SymbolKind.SelectorlessComponent,
-      directives,
-      templateNode: node
-    };
-  }
-  getSymbolOfSelectorlessDirective(node) {
-    const directives = this.getDirectivesOfNode(node);
-    const primaryDirective = directives.find((dir) => dir.matchSource === MatchSource3.Selector && !dir.isComponent) ?? null;
-    if (primaryDirective === null) {
-      return null;
-    }
-    return {
-      tcbLocation: primaryDirective.tcbLocation,
-      kind: SymbolKind.SelectorlessDirective,
-      directives,
-      templateNode: node
-    };
-  }
   getDirectivesOfNode(templateNode) {
     const elementSourceSpan = templateNode.startSourceSpan ?? templateNode.sourceSpan;
     const boundDirectives = this.boundTarget.getDirectivesOfNode(templateNode) ?? [];
     let symbols = this.getDirectiveSymbolsForDirectives(boundDirectives, elementSourceSpan);
-    if (!(templateNode instanceof TmplAstDirective)) {
-      const firstChild = templateNode.children.find((c) => c instanceof TmplAstElement);
-      if (firstChild !== void 0) {
-        const isMicrosyntaxTemplate = templateNode instanceof TmplAstTemplate && sourceSpanEqual(firstChild.sourceSpan, templateNode.sourceSpan);
-        if (isMicrosyntaxTemplate) {
-          const firstChildDirectives = this.boundTarget.getDirectivesOfNode(firstChild);
-          if (firstChildDirectives !== null) {
-            const childSymbols = this.getDirectiveSymbolsForDirectives(firstChildDirectives, elementSourceSpan);
-            for (const symbol of childSymbols) {
-              if (!symbols.some((s) => s.ref.name === symbol.ref.name && s.ref.filePath === symbol.ref.filePath)) {
-                symbols.push(symbol);
-              }
+    const firstChild = templateNode.children.find((c) => c instanceof TmplAstElement);
+    if (firstChild !== void 0) {
+      const isMicrosyntaxTemplate = templateNode instanceof TmplAstTemplate && sourceSpanEqual(firstChild.sourceSpan, templateNode.sourceSpan);
+      if (isMicrosyntaxTemplate) {
+        const firstChildDirectives = this.boundTarget.getDirectivesOfNode(firstChild);
+        if (firstChildDirectives !== null) {
+          const childSymbols = this.getDirectiveSymbolsForDirectives(firstChildDirectives, elementSourceSpan);
+          for (const symbol of childSymbols) {
+            if (!symbols.some((s) => s.ref.name === symbol.ref.name && s.ref.filePath === symbol.ref.filePath)) {
+              symbols.push(symbol);
             }
           }
         }
@@ -6819,4 +6779,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-AMVKU6WJ.js.map
+//# sourceMappingURL=chunk-MLEQ2TEM.js.map

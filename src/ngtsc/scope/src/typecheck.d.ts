@@ -71,6 +71,5 @@ export declare class TypeCheckScopeRegistry {
     getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
     private applyExplicitlyDeferredFlag;
     private getSelectorMatcher;
-    private getSelectorlessMatcher;
     private combineWithHostDirectives;
 }

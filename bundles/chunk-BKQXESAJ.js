@@ -457,7 +457,7 @@ import semver2 from "semver";
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.3.0-next.4+sha-a3bc172";
+var PLACEHOLDER_VERSION = "22.3.0-next.4+sha-98b0f3b";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -566,7 +566,6 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
     name: typeName,
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
     isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : getDefaultStandaloneValue(version),
-    isSignal: metaObj.has("isSignal") ? metaObj.getBoolean("isSignal") : false,
     hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null,
     legacyOptionalChaining: major < 22 && version !== PLACEHOLDER_VERSION
   };
@@ -727,9 +726,7 @@ var PartialComponentLinkerVersion1 = class {
       // We normalize line endings if the template is was inline.
       i18nNormalizeLineEndingsInICUs: isInline,
       enableBlockSyntax,
-      enableLetSyntax,
-      // TODO(crisbeto): figure out how this is enabled.
-      enableSelectorless: false
+      enableLetSyntax
     });
     if (template.errors !== null) {
       const errors = template.errors.map((err) => err.toString()).join("\n");
@@ -1412,4 +1409,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Q75NFDS4.js.map
+//# sourceMappingURL=chunk-BKQXESAJ.js.map

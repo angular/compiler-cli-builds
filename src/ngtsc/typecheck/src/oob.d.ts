@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, BindingPipe, OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, PropertyRead, TcbDirectiveMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstBoundaryBlock, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger, TypeCheckId } from '@angular/compiler';
+import { AST, BindingPipe, OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, PropertyRead, TcbDirectiveMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstBoundaryBlock, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger, TypeCheckId } from '@angular/compiler';
 import ts from 'typescript';
 import { TemplateDiagnostic } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
@@ -29,20 +29,17 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     duplicateTemplateVar(id: TypeCheckId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
     splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'>, outputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'> | TmplAstElement): void;
-    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBandDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty | TmplAstBoundaryBlock, preservesWhitespaces: boolean): void;
     illegalWriteToLetDeclaration(id: TypeCheckId, node: AST, target: TmplAstLetDeclaration): void;
     letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     conflictingDeclaration(id: TypeCheckId, decl: TmplAstLetDeclaration): void;
-    missingNamedTemplateDependency(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
-    incorrectTemplateDependencyType(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
-    unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
     deferImplicitTriggerMissingPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
     multipleMatchingComponents(id: TypeCheckId, element: TmplAstElement, componentNames: string[]): void;
-    conflictingHostDirectiveBinding(id: TypeCheckId, node: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, kind: 'input' | 'output', classPropertyName: string, aliases: string[]): void;
+    conflictingHostDirectiveBinding(id: TypeCheckId, node: TmplAstElement | TmplAstTemplate, directiveName: string, kind: 'input' | 'output', classPropertyName: string, aliases: string[]): void;
     private getTagNameSpan;
 }

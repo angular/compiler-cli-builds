@@ -135,7 +135,6 @@ export declare class NgCompiler {
     private readonly angularCoreVersion;
     private readonly enableHmr;
     private readonly implicitStandaloneValue;
-    private readonly enableSelectorless;
     private readonly emitDeclarationOnly;
     private readonly enableTemplateSourceLocations;
     /**

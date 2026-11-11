@@ -10,7 +10,7 @@ import {
   extractHmrDependenciesFromOutput,
   generateIndexerAnalysis,
   getIndexerTemplateIdentifiers
-} from "../chunk-ASWX3JX2.js";
+} from "../chunk-5IEYX442.js";
 import {
   Environment,
   ExpressionIdentifier,
@@ -20,11 +20,11 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-AMVKU6WJ.js";
+} from "../chunk-MLEQ2TEM.js";
 import {
   ErrorCode,
   validateAndRewriteCoreSymbol
-} from "../chunk-GRXOHCCP.js";
+} from "../chunk-JSEB7RQH.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";

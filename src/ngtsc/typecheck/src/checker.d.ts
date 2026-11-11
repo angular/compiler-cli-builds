@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AbsoluteSourceSpan, AST, BoundTarget, ForeignComponentMeta, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TypeCheckingConfig } from '@angular/compiler';
+import { AbsoluteSourceSpan, AST, BoundTarget, ForeignComponentMeta, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { BindingSymbol, ClassSymbol, ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta } from '../api';
+import { BindingSymbol, ClassSymbol, ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, Symbol, SymbolReference, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
 import { SymbolBoundTarget, SymbolDirectiveMeta } from './template_symbol_builder';
@@ -156,8 +156,6 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getFileData(path: AbsoluteFsPath): FileTypeCheckingData;
     getSymbolOfNode(node: TmplAstTemplate, component: ts.ClassDeclaration): TemplateSymbol | null;
     getSymbolOfNode(node: TmplAstElement, component: ts.ClassDeclaration): ElementSymbol | null;
-    getSymbolOfNode(node: TmplAstComponent, component: ts.ClassDeclaration): SelectorlessComponentSymbol | null;
-    getSymbolOfNode(node: TmplAstDirective, component: ts.ClassDeclaration): SelectorlessDirectiveSymbol | null;
     private getOrCreateSymbolBuilder;
     getGlobalTsContext(component: ts.ClassDeclaration): TcbLocation | null;
     private getRefKey;

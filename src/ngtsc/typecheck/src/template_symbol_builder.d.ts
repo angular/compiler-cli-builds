@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, ClassPropertyMapping, MatchSource, ReferenceTarget, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TypeCheckingConfig } from '@angular/compiler';
+import { AST, ClassPropertyMapping, MatchSource, ReferenceTarget, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { HostDirectiveMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TemplateSymbol, VariableSymbol } from '../api';
+import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, Symbol, SymbolReference, TemplateSymbol, VariableSymbol } from '../api';
 export interface SymbolDirectiveMeta {
     getSymbolReference(): SymbolReference;
     getNgModule(): ClassDeclaration | null;
@@ -44,13 +44,9 @@ export declare class SymbolBuilder {
     constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, boundTarget: SymbolBoundTarget, typeCheckingConfig: TypeCheckingConfig);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
     getSymbol(node: TmplAstReference | TmplAstVariable | TmplAstLetDeclaration): ReferenceSymbol | VariableSymbol | LetDeclarationSymbol | null;
-    getSymbol(node: TmplAstComponent): SelectorlessComponentSymbol | null;
-    getSymbol(node: TmplAstDirective): SelectorlessDirectiveSymbol | null;
     getSymbol(node: AST | TmplAstNode): Symbol | null;
     private getSymbolOfAstTemplate;
     private getSymbolOfElement;
-    private getSymbolOfSelectorlessComponent;
-    private getSymbolOfSelectorlessDirective;
     private getDirectivesOfNode;
     private getDirectiveSymbolsForDirectives;
     private getSymbolOfBoundEvent;
