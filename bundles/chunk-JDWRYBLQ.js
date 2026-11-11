@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-effbe56";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-e4f6744";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5533,15 +5533,16 @@ var RegistryDomSchemaChecker = class {
       const mapping = this.resolver.getTemplateSourceMapping(id);
       const decorator = hostIsStandalone ? "@Component" : "@NgModule";
       const schemas2 = `'${decorator}.schemas'`;
-      let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
-      if (tagName.startsWith("ng-")) {
+      const localTagName = tagName.startsWith(":") ? tagName.slice(tagName.indexOf(":", 1) + 1) : tagName;
+      let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${localTagName}'.`;
+      if (localTagName.startsWith("ng-")) {
         errorMsg += `
 1. If '${name}' is an Angular directive, then add 'CommonModule' to the '${decorator}.imports' of this component.
 2. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
-      } else if (tagName.indexOf("-") > -1) {
+      } else if (localTagName.indexOf("-") > -1) {
         errorMsg += `
-1. If '${tagName}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
-2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
+1. If '${localTagName}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+2. If '${localTagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
 3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
       const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
@@ -6779,4 +6780,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MLEQ2TEM.js.map
+//# sourceMappingURL=chunk-JDWRYBLQ.js.map

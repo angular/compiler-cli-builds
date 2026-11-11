@@ -49,7 +49,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-D5EVAODN.js";
+} from "./chunk-IRDAAWGT.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -97,7 +97,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-MLEQ2TEM.js";
+} from "./chunk-JDWRYBLQ.js";
 import {
   ErrorCode
 } from "./chunk-JSEB7RQH.js";
@@ -4700,7 +4700,10 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        allowDomEventAssertion
+        allowDomEventAssertion,
+        checkTypeOfNgTemplateBindings: false
+        // 3p-only
+        // g3-only checkTypeOfNgTemplateBindings: true,
       };
     } else {
       typeCheckingConfig = {
@@ -4731,7 +4734,10 @@ var NgCompiler = class _NgCompiler {
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
         allowDomEventAssertion,
-        checkUnknownElements: false
+        checkUnknownElements: false,
+        checkTypeOfNgTemplateBindings: false
+        // 3p-only
+        // g3-only checkTypeOfNgTemplateBindings: true,
       };
     }
     if (this.options.strictInputTypes !== void 0) {
@@ -4768,6 +4774,9 @@ var NgCompiler = class _NgCompiler {
     }
     if (this.options.strictLiteralTypes !== void 0) {
       typeCheckingConfig.strictLiteralTypes = this.options.strictLiteralTypes;
+    }
+    if (this.options.strictNgTemplateTypes !== void 0) {
+      typeCheckingConfig.checkTypeOfNgTemplateBindings = this.options.strictNgTemplateTypes;
     }
     if (this.options.extendedDiagnostics?.checks?.controlFlowPreventingContentProjection !== void 0) {
       typeCheckingConfig.controlFlowPreventingContentProjection = this.options.extendedDiagnostics.checks.controlFlowPreventingContentProjection;
@@ -5383,4 +5392,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PUY6AZUV.js.map
+//# sourceMappingURL=chunk-XGBNUU2Y.js.map

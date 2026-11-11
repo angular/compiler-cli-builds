@@ -215,6 +215,14 @@ export interface TypeCheckingOptions {
      * Defaults to `false`.
      */
     strictUnknownElements?: boolean;
+    /**
+     * Whether to check if unknown properties are bound to `<ng-template>`.
+     *
+     * If this is `true`, an error will be reported for unknown properties bound to an `<ng-template>`.
+     *
+     * Defaults to `false`.
+     */
+    strictNgTemplateTypes?: boolean;
 }
 /**
  * A label referring to a `ts.DiagnosticCategory` or `'suppress'`, meaning the associated diagnostic
