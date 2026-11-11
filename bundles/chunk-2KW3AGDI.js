@@ -83,12 +83,10 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-SNJY7KMC.js";
+} from "./chunk-AMVKU6WJ.js";
 import {
-  ErrorCode,
-  PotentialTopLevelReadsVisitor,
-  extractHmrDependenciesFromOutput
-} from "./chunk-MLQGKKBD.js";
+  ErrorCode
+} from "./chunk-GRXOHCCP.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7510,7 +7508,7 @@ function transformToTypeTupleExpression(expr, evaluator, refEmitter, sourceFile,
 import { outputAst as o3 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.js
-import { outputAst as o2 } from "@angular/compiler";
+import { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, outputAst as o2 } from "@angular/compiler";
 import ts27 from "typescript";
 function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator) {
   const name = ts27.isClassDeclaration(node) && node.name ? node.name.text : null;
@@ -15062,4 +15060,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZCUYY4IM.js.map
+//# sourceMappingURL=chunk-2KW3AGDI.js.map

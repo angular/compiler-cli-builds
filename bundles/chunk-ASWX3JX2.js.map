@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../private/hybrid_preprocessor.ts", "../src/ngtsc/indexer/index.ts"],
+  "mappings": ";;;;;;AAYA,SACE,kCACA,qCAIK;;;ACRP,SACE,oBACA,gBACA,iBAC2B,yBACM,qCAoB5B;",
+  "names": []
+}

@@ -4,11 +4,15 @@
     
 import {
   ErrorCode,
-  PotentialTopLevelReadsVisitor,
-  extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-MLQGKKBD.js";
+} from "../chunk-GRXOHCCP.js";
 import "../chunk-IEBNHER4.js";
+
+// packages/compiler-cli/private/hybrid_preprocessor.ts
+import {
+  extractHmrDependenciesFromOutput,
+  PotentialTopLevelReadsVisitor
+} from "@angular/compiler";
 export {
   ErrorCode,
   PotentialTopLevelReadsVisitor,

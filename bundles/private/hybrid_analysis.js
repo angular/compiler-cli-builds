@@ -6,9 +6,11 @@ import {
   AbsoluteSourceSpan,
   IdentifierKind,
   IndexingContext,
+  PotentialTopLevelReadsVisitor,
+  extractHmrDependenciesFromOutput,
   generateIndexerAnalysis,
   getIndexerTemplateIdentifiers
-} from "../chunk-LGAXIPQ2.js";
+} from "../chunk-ASWX3JX2.js";
 import {
   Environment,
   ExpressionIdentifier,
@@ -18,13 +20,11 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-SNJY7KMC.js";
+} from "../chunk-AMVKU6WJ.js";
 import {
   ErrorCode,
-  PotentialTopLevelReadsVisitor,
-  extractHmrDependenciesFromOutput,
   validateAndRewriteCoreSymbol
-} from "../chunk-MLQGKKBD.js";
+} from "../chunk-GRXOHCCP.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";

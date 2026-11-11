@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3CompiledExpression, R3ComponentDeferMetadata, outputAst as o } from '@angular/compiler';
+import { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, R3CompiledExpression, R3ComponentDeferMetadata, outputAst as o, type HmrCompiledOutput, type HmrDependencies, type HmrReadResolver } from '@angular/compiler';
 import { DeclarationNode, ReflectionHost } from '../../reflection';
 import { CompileResult } from '../../transform';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, type HmrCompiledOutput, type HmrDependencies, type HmrReadResolver } from './extract_dependencies_output';
 export { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, type HmrCompiledOutput, type HmrDependencies, type HmrReadResolver, };
 /**
  * Determines the file-level dependencies that the HMR initializer needs to capture and pass along.

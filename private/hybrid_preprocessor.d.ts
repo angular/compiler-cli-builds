@@ -7,4 +7,4 @@
  */
 export { ErrorCode } from '../src/ngtsc/diagnostics/src/error_code';
 export { validateAndRewriteCoreSymbol } from '../src/ngtsc/imports/src/core_symbols';
-export { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, type HmrCompiledOutput, type HmrDependencies, type HmrReadResolver, } from '../src/ngtsc/hmr/src/extract_dependencies_output';
+export { extractHmrDependenciesFromOutput, PotentialTopLevelReadsVisitor, type HmrCompiledOutput, type HmrDependencies, type HmrReadResolver, } from '@angular/compiler';

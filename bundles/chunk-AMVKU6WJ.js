@@ -6,7 +6,7 @@ import {
   CORE_MODULE,
   ErrorCode,
   validateAndRewriteCoreSymbol
-} from "./chunk-MLQGKKBD.js";
+} from "./chunk-GRXOHCCP.js";
 import {
   Context,
   ExpressionTranslatorVisitor
@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-e05aff7";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.4+sha-6706475";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6819,4 +6819,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SNJY7KMC.js.map
+//# sourceMappingURL=chunk-AMVKU6WJ.js.map
