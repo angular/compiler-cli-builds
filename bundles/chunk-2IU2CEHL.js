@@ -2695,10 +2695,12 @@ var EXTENDED_ERROR_DETAILS_PAGE_BASE_URL = (() => {
 })();
 function formatExtendedError(code, message) {
   const fullCode = `NG${Math.abs(code)}`;
-  const errorMessage = `${fullCode}${message ? ": " + message : ""}`;
-  const addPeriodSeparator = !errorMessage.match(/[.,;!?\n]$/);
-  const separator = addPeriodSeparator ? "." : "";
-  return `${errorMessage}${separator} Find more at ${EXTENDED_ERROR_DETAILS_PAGE_BASE_URL}/${fullCode}`;
+  const details = `Find more at ${EXTENDED_ERROR_DETAILS_PAGE_BASE_URL}/${fullCode}`;
+  if (!message) {
+    return details;
+  }
+  const separator = /[.,;!?\n]$/.test(message) ? "" : ".";
+  return `${message}${separator} ${details}`;
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
@@ -5392,4 +5394,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XGBNUU2Y.js.map
+//# sourceMappingURL=chunk-2IU2CEHL.js.map
