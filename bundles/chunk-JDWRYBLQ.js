@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.4.0-next.0+sha-d201dd7";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.4.0-next.0+sha-34c6c98";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
