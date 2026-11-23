@@ -3356,7 +3356,7 @@ var factory12 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
-import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive as LiteralPrimitive2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, TmplAstBoundDeferredTrigger, TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive as LiteralPrimitive2 } from "@angular/compiler";
 function areLiteralMapsEqual(a, b) {
   const aIsEmpty = a === null || a.keys.length === 0;
   const bIsEmpty = b === null || b.keys.length === 0;
@@ -3398,6 +3398,10 @@ function formatTimedTrigger(trigger) {
     return `timer(${trigger.delay}ms)`;
   }
   return trigger.timeout === null ? "idle" : `idle(${trigger.timeout}ms)`;
+}
+function getWhenExpressionSource(trigger) {
+  const value = trigger.value;
+  return value instanceof ASTWithSource5 && value.source !== null ? value.source.trim() : null;
 }
 var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
   code = ErrorCode.DEFER_TRIGGER_MISCONFIGURATION;
@@ -3450,6 +3454,14 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
           if (referencesMatch && optionsMatch) {
             const kindName = main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
             const msg = `Prefetch '${kindName}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
+          }
+          continue;
+        }
+        if (main instanceof TmplAstBoundDeferredTrigger && pre instanceof TmplAstBoundDeferredTrigger) {
+          const mainSource = getWhenExpressionSource(main);
+          if (mainSource !== null && mainSource === getWhenExpressionSource(pre)) {
+            const msg = `Prefetch 'when' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
             diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
           }
           continue;
@@ -3557,7 +3569,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead3, Binary as Binary2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource6, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead3, Binary as Binary2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
 import ts21 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3663,7 +3675,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource5 ? ast.ast : ast;
+  return ast instanceof ASTWithSource6 ? ast.ast : ast;
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
@@ -5394,4 +5406,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5JMIUAG3.js.map
+//# sourceMappingURL=chunk-XO24SNWC.js.map
