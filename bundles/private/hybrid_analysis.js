@@ -20,7 +20,7 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-JDWRYBLQ.js";
+} from "../chunk-4XI7TPLA.js";
 import {
   ErrorCode,
   validateAndRewriteCoreSymbol
