@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0+sha-bb930fe";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0+sha-6e61b2c";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6070,7 +6070,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
+import { ArrowFunctionIdentifierParameter, AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
 import ts33 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
@@ -6503,7 +6503,7 @@ var SymbolBuilder = class {
       expression = expression.ast;
     }
     const expressionTarget = this.boundTarget.getExpressionTarget(expression);
-    if (expressionTarget !== null) {
+    if (expressionTarget !== null && !(expressionTarget instanceof ArrowFunctionIdentifierParameter)) {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
@@ -6814,4 +6814,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4XI7TPLA.js.map
+//# sourceMappingURL=chunk-MTGRZ4Y6.js.map

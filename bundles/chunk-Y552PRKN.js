@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-4XI7TPLA.js";
+} from "./chunk-MTGRZ4Y6.js";
 import {
   ErrorCode
 } from "./chunk-JSEB7RQH.js";
@@ -7615,7 +7615,7 @@ import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as 
 import ts35 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
-import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
+import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute, TmplAstVariable } from "@angular/compiler";
 import ts29 from "typescript";
 var CompletionEngine = class {
   tcb;
@@ -7806,7 +7806,7 @@ var CompletionEngine = class {
           kind: CompletionKind.LetDeclaration,
           node
         });
-      } else {
+      } else if (node instanceof TmplAstVariable) {
         templateContext.set(node.name, {
           kind: CompletionKind.Variable,
           node
@@ -14805,4 +14805,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VIOCP4WO.js.map
+//# sourceMappingURL=chunk-Y552PRKN.js.map
