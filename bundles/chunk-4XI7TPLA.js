@@ -27,7 +27,7 @@ import {
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.4.0-next.0+sha-c9cbeb7";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.4.0-next.0+sha-c69da30";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4008,7 +4008,7 @@ function createGenerateUniqueIdentifierHelper() {
       throw new Error("Source file unexpectedly lacks map of parsed `identifiers`.");
     }
     const isUniqueIdentifier = (name2) => !sf["identifiers"].has(name2) && !isGeneratedIdentifier(sf, name2);
-    if (isUniqueIdentifier(symbolName)) {
+    if (isUniqueIdentifier(symbolName) || !isGeneratedIdentifier(sf, symbolName) && !getBindingNames(sf).has(symbolName)) {
       markIdentifierAsGenerated(sf, symbolName);
       return null;
     }
@@ -4020,6 +4020,40 @@ function createGenerateUniqueIdentifierHelper() {
     markIdentifierAsGenerated(sf, name);
     return ts16.factory.createUniqueName(name, ts16.GeneratedIdentifierFlags.Optimistic);
   };
+}
+var bindingNamesCache = /* @__PURE__ */ new WeakMap();
+function getBindingNames(sf) {
+  let names = bindingNamesCache.get(sf);
+  if (names === void 0) {
+    names = /* @__PURE__ */ new Set();
+    const visit = (node, parent) => {
+      if (ts16.isIdentifier(node)) {
+        if (!isNonBindingName(node, parent)) {
+          names.add(node.text);
+        }
+      } else if (!ts16.isExportDeclaration(node) || node.moduleSpecifier === void 0) {
+        ts16.forEachChild(node, (child) => visit(child, node));
+      }
+    };
+    ts16.forEachChild(sf, (child) => visit(child, sf));
+    bindingNamesCache.set(sf, names);
+  }
+  return names;
+}
+function isNonBindingName(node, parent) {
+  if (ts16.isQualifiedName(parent)) {
+    return parent.right === node;
+  }
+  if (ts16.isBindingElement(parent) || ts16.isImportSpecifier(parent)) {
+    return parent.propertyName === node;
+  }
+  if (ts16.isExportSpecifier(parent)) {
+    return parent.propertyName !== void 0 && parent.name === node;
+  }
+  if (ts16.isLabeledStatement(parent) || ts16.isBreakStatement(parent) || ts16.isContinueStatement(parent)) {
+    return parent.label === node;
+  }
+  return (ts16.isPropertyAccessExpression(parent) || ts16.isPropertyAssignment(parent) || ts16.isPropertyDeclaration(parent) || ts16.isPropertySignature(parent) || ts16.isMethodDeclaration(parent) || ts16.isMethodSignature(parent) || ts16.isGetAccessorDeclaration(parent) || ts16.isSetAccessorDeclaration(parent) || ts16.isEnumMember(parent) || ts16.isNamedTupleMember(parent) || ts16.isJsxAttribute(parent)) && parent.name === node;
 }
 
 // packages/compiler-cli/src/ngtsc/translator/src/import_manager/import_typescript_transform.js
@@ -6780,4 +6814,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JDWRYBLQ.js.map
+//# sourceMappingURL=chunk-4XI7TPLA.js.map
