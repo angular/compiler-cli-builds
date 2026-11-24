@@ -3231,28 +3231,28 @@ var factory9 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, ArrowFunction, SafeCall as SafeCall2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
-  visitNode(ctx, component, node) {
+  visitNode(ctx, _component, node) {
     if (!(node instanceof TmplAstBoundEvent2))
       return [];
-    if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.LegacyAnimation)
+    if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.LegacyAnimation) {
       return [];
+    }
     if (!(node.handler instanceof ASTWithSource3))
       return [];
-    const sourceExpressionText = node.handler.source || "";
     if (node.handler.ast instanceof Chain) {
-      return node.handler.ast.expressions.flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
+      return node.handler.ast.expressions.flatMap((expression) => assertExpressionInvoked(expression, node, ctx));
     }
     if (node.handler.ast instanceof Conditional2) {
       const { trueExp, falseExp } = node.handler.ast;
-      return [trueExp, falseExp].flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
+      return [trueExp, falseExp].flatMap((expression) => assertExpressionInvoked(expression, node, ctx));
     }
-    return assertExpressionInvoked(node.handler.ast, component, node, sourceExpressionText, ctx);
+    return assertExpressionInvoked(node.handler.ast, node, ctx);
   }
 };
-function assertExpressionInvoked(expression, component, node, expressionText, ctx) {
+function assertExpressionInvoked(expression, node, ctx) {
   if (expression instanceof Call || expression instanceof SafeCall2) {
     return [];
   }
@@ -3260,22 +3260,7 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
     const errorString = "Arrow function will not be invoked in this event listener. Did you intend to call a method?";
     return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
   }
-  if (!(expression instanceof PropertyRead2) && !(expression instanceof SafePropertyRead2)) {
-    return [];
-  }
-  const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
-  if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-    const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
-    if (type && type.getCallSignatures()?.length > 0) {
-      const fullExpressionText = generateStringFromExpression(expression, expressionText);
-      const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING, `Function in event binding should be invoked: ${fullExpressionText}()`);
-      return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
-    }
-  }
   return [];
-}
-function generateStringFromExpression(expression, source) {
-  return source.substring(expression.span.start, expression.span.end);
 }
 var factory10 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
@@ -3569,7 +3554,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource6, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead3, Binary as Binary2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource6, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead2, Binary as Binary2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
 import ts21 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3610,7 +3595,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.diagnostics = diagnostics;
   }
   visitBinary(ast, context) {
-    if (Binary2.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead3) {
+    if (Binary2.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead2) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
     }
     super.visitBinary(ast, context);
@@ -3618,7 +3603,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   visitUnary(ast, context) {
     if (Unary2.isUpdateOperation(ast.operator)) {
       const target = unwrapWriteTarget(ast.expr);
-      if (target instanceof PropertyRead3) {
+      if (target instanceof PropertyRead2) {
         this.checkForIllegalWriteInEventBinding(target, context);
       }
     }
@@ -5406,4 +5391,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XO24SNWC.js.map
+//# sourceMappingURL=chunk-VVBJTY4M.js.map
